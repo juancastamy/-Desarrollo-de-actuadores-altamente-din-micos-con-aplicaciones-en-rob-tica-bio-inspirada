@@ -59,7 +59,7 @@ uint32_t contador=0;
 uint32_t posicio;
 uint32_t velocidad;
 int32_t direccion;
-
+uint32_t giro[1];
 int main(void)
 {
 //-------------------------------------SE CONFIGURA EL RELOJ DEL MICROCONTROLADOR A 16MHZ----------------------------------------------
@@ -110,7 +110,7 @@ int main(void)
 //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
-    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
+    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
     GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
 //-----------------------------------------------PWM------------------------------------------------------------------------------------
     pwm_word = (1/PWM_FREC)*CPU_FREC;
@@ -150,16 +150,35 @@ int main(void)
         //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
         if(COUNT[0]<=100){
             COUNT[0]=100;
-            //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4,GPIO_PIN_4);
-            //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
         }
         else if(COUNT[0]>=3645){
             COUNT[0]=3995;
             //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_6|GPIO_PIN_7,0x00);
             //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
+
+
+        }
+        if(COUNT[0]>=100 && COUNT[0]<1365){
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+            giro[0] = 4095-COUNT[0]*4095/1365;
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro[0]*800/4095);
+
+
+        }
+        else if(COUNT[0]>=1365 && COUNT[0]<2730){
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+        }
+        else if(COUNT[0]>=2730 && COUNT[0]<4095){
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
+            giro[0] = (COUNT[0]-2730)*(4095)/(4095-2730);
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro[0]*800/4095);
         }
 
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, COUNT[0]*800/4095);
         posicio=QEIPositionGet(QEI0_BASE);
         po=posicio*360/978;
         direccion=QEIDirectionGet(QEI0_BASE);
