@@ -27,7 +27,7 @@
 #include "driverlib/qei.h"
 
 #define N 245
-uint32_t COUNT[1];
+uint32_t COUNT;
 
 uint32_t CPU_FREC=16000000;
 uint32_t PWM_FREC=20000;
@@ -59,7 +59,32 @@ uint32_t contador=0;
 uint32_t posicio;
 uint32_t velocidad;
 int32_t direccion;
-uint32_t giro[1];
+uint32_t giro;
+uint32_t Kp=2;
+uint32_t Ki=0.00001;
+uint32_t Kd=0.001;
+uint32_t ek = 0;
+uint32_t uk = 0;
+uint32_t ek_1 = 0;
+uint32_t Ek_1 = 0;
+uint32_t ed = 0;
+uint32_t Ek = 0;
+uint32_t ref;
+uint32_t ref2;
+uint32_t out;
+float ref22;
+float ref11;
+void control_pid (uint32_t *giro, uint32_t x, uint32_t entrada)
+{
+    ek = entrada - x;
+    ed = ek - ek_1;
+    Ek = Ek_1+ek;
+    Ek_1=Ek;
+    ek_1=ek;
+    uk = Kp*ek + Ki*Ek + Kd*ed ;
+    *giro=uk*3995/7503;
+
+}
 int main(void)
 {
 //-------------------------------------SE CONFIGURA EL RELOJ DEL MICROCONTROLADOR A 16MHZ----------------------------------------------
@@ -146,13 +171,13 @@ int main(void)
         ADCIntClear(ADC0_BASE, 3);
         ADCProcessorTrigger(ADC0_BASE, 3);
         while(!ADCIntStatus(ADC0_BASE, 3, false));
-        ADCSequenceDataGet(ADC0_BASE, 3, COUNT);
+        ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);
         //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
-        if(COUNT[0]<=100){
-            COUNT[0]=100;
+        if(COUNT<=100){
+            COUNT=100;
         }
-        else if(COUNT[0]>=3645){
-            COUNT[0]=3995;
+        else if(COUNT>=3645){
+            COUNT=3995;
             //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_6|GPIO_PIN_7,0x00);
             //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
@@ -160,38 +185,57 @@ int main(void)
 
 
         }
-        if(COUNT[0]>=100 && COUNT[0]<1365){
+
+        if(COUNT>=100 && COUNT<1365){
+        	if(COUNT<100){
+        		COUNT=100;
+        	}
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-            giro[0] = 4095-COUNT[0]*4095/1365;
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro[0]*800/4095);
+
+            ref11 = (float)((1365-COUNT)*3995/(1365-100));
+            ref = (int)ref11*7503/3995;
+            velocidad=QEIVelocityGet(QEI0_BASE);
+            control_pid(&giro, (velocidad),(ref));
+
+
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro*800/4095);
 
 
         }
-        else if(COUNT[0]>=1365 && COUNT[0]<2730){
+        else if(COUNT>=1365 && COUNT<2730){
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
         }
-        else if(COUNT[0]>=2730 && COUNT[0]<4095){
+        else if(COUNT>=2730 && COUNT<4095){
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-            giro[0] = (COUNT[0]-2730)*(4095)/(4095-2730);
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro[0]*800/4095);
+            out=uk*3995/7503;
+            ref22=(float)((COUNT-2730)*3995/(3995-2730));
+            ref2=(int)ref22*7503/3995;
+            velocidad=QEIVelocityGet(QEI0_BASE);
+			control_pid(&giro, (velocidad),(ref2));
+
+            control_pid(&giro, (velocidad),(ref2));
+
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, giro*800/4095);
         }
 
         posicio=QEIPositionGet(QEI0_BASE);
         po=posicio*360/978;
         direccion=QEIDirectionGet(QEI0_BASE);
-        velocidad=QEIVelocityGet(QEI0_BASE);
+
         //float adc=(float)COUNT[0];
         //UARTprintf("%d \n",(int)adc);
-
-        /*float ve=(float)velocidad;
-        float di=(float)direccion;
-        UARTprintf("posicion: %d \n",(int)po);
+        float ref_print=(float)ref;
+        float ve=(float)velocidad;
+        float adc=(float)COUNT;
+        UARTprintf("adc: %d \n",(int)adc);
         UARTprintf("velocidad: %d \n",(int)ve);
-        UARTprintf("direccion: %d \n",(int)di);*/
+        UARTprintf("ref: %d \n",(int)ref_print);
 
+
+        //(u-COTA_INF)*4095/(COTA_SUP-COTA_INF
 
     }
         return 0;
