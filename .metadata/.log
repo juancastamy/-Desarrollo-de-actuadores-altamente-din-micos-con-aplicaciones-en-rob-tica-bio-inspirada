@@ -1447,3 +1447,237 @@ java.lang.Exception: The project description file (.project) for 'RemoteSystemsT
 !ENTRY com.ti.ccstudio.debug 1 0 2021-08-08 19:41:48.959
 !MESSAGE DS_ERROR: Error connecting to the target:
 Unable to communicate with the device. Please check your connection.
+!SESSION 2021-08-10 10:22:28.826 -----------------------------------------------
+eclipse.buildId=4.14.0.I20191210-0610
+java.version=1.8.0_144
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.ti.ccstudio.branding.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.ti.ccstudio.branding.product
+
+!ENTRY com.ti.common.core 1 0 2021-08-10 10:23:04.945
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 1 0 2021-08-10 10:23:04.946
+!MESSAGE debugServerDir=C:/ti/ccs1000/ccs/ccs_base/DebugServer
+
+!ENTRY com.ti.ccstudio.ui 1 0 2021-08-10 10:24:22.410
+!MESSAGE CCS IDE session started!
+	CCS build: 10.2.0.00009
+	CCS location: C:/ti/ccs1000/ccs
+	Workspace location: C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.461
+!MESSAGE constructor
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.462
+!MESSAGE done with directories
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.463
+!MESSAGE loading ti_logger
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.464
+!MESSAGE Platform os: win32
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.465
+!MESSAGE loading cToolsIF
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.581
+!MESSAGE loading cTools
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:23.763
+!MESSAGE loading TraceFactory
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:24.033
+!MESSAGE loading sqlite3
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:24.223
+!MESSAGE loading CloudTrace
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-10 10:24:24.956
+!MESSAGE CloudTrace interface loaded
+
+!ENTRY com.ti.ccstudio.project.ui.webcontent 1 0 2021-08-10 10:24:25.392
+!MESSAGE CCS HTTP adapter started! [ccs.port:55435] - Open 'http://localhost:55435/ide' in web browser to see listing of available APIs...
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 11:39:04.813
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Connection with the target was unexpectedly lost.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 11:39:04.838
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:17:32.926
+!MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_posicion\Debug\PID_posicion.out Could not open file
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:31:04.526
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Connection with the target was unexpectedly lost.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:31:04.552
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:22.797
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error connecting to the target: Unable to communicate with the device. Please check your connection.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:23.050
+!MESSAGE DS_ERROR: Error connecting to the target:
+Unable to communicate with the device. Please check your connection.
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:29.091
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error connecting to the target: Unable to communicate with the device. Please check your connection.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:29.125
+!MESSAGE DS_ERROR: Error connecting to the target:
+Unable to communicate with the device. Please check your connection.
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:29.970
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error connecting to the target: Unable to communicate with the device. Please check your connection.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:30.013
+!MESSAGE DS_ERROR: Error connecting to the target:
+Unable to communicate with the device. Please check your connection.
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:32:31.249
+!MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_posicion\Debug\PID_posicion.out Could not open file
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:53:02.967
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Connection with the target was unexpectedly lost.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-10 12:53:03.001
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+
+!SESSION 2021-08-12 10:49:41.048 -----------------------------------------------
+eclipse.buildId=4.14.0.I20191210-0610
+java.version=1.8.0_144
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.ti.ccstudio.branding.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.ti.ccstudio.branding.product
+
+!ENTRY com.ti.common.core 1 0 2021-08-12 10:49:55.247
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 1 0 2021-08-12 10:49:55.423
+!MESSAGE debugServerDir=C:/ti/ccs1000/ccs/ccs_base/DebugServer
+
+!ENTRY com.ti.ccstudio.ui 1 0 2021-08-12 10:52:06.091
+!MESSAGE CCS IDE session started!
+	CCS build: 10.2.0.00009
+	CCS location: C:/ti/ccs1000/ccs
+	Workspace location: C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.852
+!MESSAGE constructor
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.853
+!MESSAGE done with directories
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.853
+!MESSAGE loading ti_logger
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.855
+!MESSAGE Platform os: win32
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.855
+!MESSAGE loading cToolsIF
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:08.926
+!MESSAGE loading cTools
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:09.047
+!MESSAGE loading TraceFactory
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:09.124
+!MESSAGE loading sqlite3
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:09.224
+!MESSAGE loading CloudTrace
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 10:52:09.638
+!MESSAGE CloudTrace interface loaded
+
+!ENTRY com.ti.ccstudio.project.ui.webcontent 1 0 2021-08-12 10:52:10.846
+!MESSAGE CCS HTTP adapter started! [ccs.port:51149] - Open 'http://localhost:51149/ide' in web browser to see listing of available APIs...
+!SESSION 2021-08-12 11:10:17.279 -----------------------------------------------
+eclipse.buildId=4.14.0.I20191210-0610
+java.version=1.8.0_144
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product com.ti.ccstudio.branding.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.ti.ccstudio.branding.product
+
+!ENTRY org.eclipse.core.resources 2 10035 2021-08-12 11:10:34.422
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.ti.common.core 1 0 2021-08-12 11:10:34.478
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 1 0 2021-08-12 11:10:34.479
+!MESSAGE debugServerDir=C:/ti/ccs1000/ccs/ccs_base/DebugServer
+
+!ENTRY com.ti.ccstudio.ui 1 0 2021-08-12 11:10:45.703
+!MESSAGE CCS IDE session started!
+	CCS build: 10.2.0.00009
+	CCS location: C:/ti/ccs1000/ccs
+	Workspace location: C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.920
+!MESSAGE constructor
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.921
+!MESSAGE done with directories
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.922
+!MESSAGE loading ti_logger
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.924
+!MESSAGE Platform os: win32
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.925
+!MESSAGE loading cToolsIF
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.927
+!MESSAGE loading cTools
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.928
+!MESSAGE loading TraceFactory
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.930
+!MESSAGE loading sqlite3
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.933
+!MESSAGE loading CloudTrace
+
+!ENTRY com.ti.dbgtrc.webapp.CloudTraceInterface 0 0 2021-08-12 11:10:45.941
+!MESSAGE CloudTrace interface loaded
+
+!ENTRY com.ti.ccstudio.project.ui.webcontent 1 0 2021-08-12 11:10:46.220
+!MESSAGE CCS HTTP adapter started! [ccs.port:52056] - Open 'http://localhost:52056/ide' in web browser to see listing of available APIs...
+
+!ENTRY com.ti.ccstudio.debug.server 4 214294189 2021-08-12 11:10:47.292
+!MESSAGE Unexpected CCS exit detected [12/08/21 10:52 AM]!!!
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-12 11:25:38.145
+!MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_posicion\Debug\PID_posicion.out Could not open file
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-12 11:30:03.971
+!MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_posicion\Debug\PID_posicion.out Could not open file
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-12 12:54:22.461
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Connection with the target was unexpectedly lost.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-08-12 12:54:22.499
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+

@@ -64,6 +64,7 @@ float ref2;
 
 float ref22;
 float ref11;
+float ref_1;
 int pulso;
 
 struct PID_values out;
@@ -82,9 +83,9 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     float ek;
     float ed;
     float Ek;
-    float Kp=0.4;
-    float Ki=0.0000007;
-    float Kd=0.9;
+    float Kp=0.5;
+    float Ki=0.0005;
+    float Kd=0.73;
     float uk;
     //if (entrada>x)
     //{
@@ -158,7 +159,7 @@ int main(void)
     QEIEnable(QEI0_BASE);
 
     //Set position to a middle value so we can see if things are working
-    QEIPositionSet(QEI0_BASE, 489);
+    QEIPositionSet(QEI0_BASE, 0);
 //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
@@ -192,13 +193,13 @@ int main(void)
     GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200, UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE );
     UARTStdioConfig(0, 115200, SysCtlClockGet());
-
+    //QEIPositionSet(QEI0_BASE,360);
 
     while(1)
     {
 //--------------------------------------SE ACTIVAN PINES PARA DEFINIR EL SENTIDO DE GIRO DEL MOTOR------------------------------
-        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+       // GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+       // GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
 
 //-------------------------------------SE LIMPIA BANDERA DE ADC PARA INICIAR A LEER EL VALOR OBTENIDO--------------------------
         ADCIntClear(ADC0_BASE, 3);
@@ -218,10 +219,26 @@ int main(void)
 
 //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
         ref11 = (float)((COUNT-100)*3995/(3995-100));
-        ref = ref11*360/(3995);/*7503*/
-        velocidad=(float)QEIPositionGet(QEI0_BASE)*360/979.2;
+        ref = 180;//ref11*360/(3995);/*7503*/
+
+        ref_1=ref;
+        velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
         out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
+        if((ref-5)>(velocidad))
+        {
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
+        }
+        else if((ref+5)<(velocidad)){
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+        }
+       else if ((ref+5)>(velocidad) && (ref-5)<(velocidad))
+        {
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+        }
 
         //control_pid(&out,velocidad,ref);
 
