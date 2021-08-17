@@ -72,6 +72,7 @@ struct PID_values out;
 
 struct PID_values
 {
+    float dif;//variable para almacenar ek
     float out;//variable para almacenar giro
     float Me;//variable para almacenar ek_1
     float ME;//variable para almacenar Ek_1
@@ -103,6 +104,7 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     uk = Kp*ek + Ki*Ek + Kd*ed ;
     giro=uk*(3995)/360;//7503;
 
+    resultado.dif = ek;
     resultado.out = giro;
     resultado.Me = ek_1;
     resultado.ME = Ek_1;
@@ -114,6 +116,9 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
 //out= control_pid (float giro, float x, float entrada, float ek_1, float Ek_1)
 
 int main(void)
+
+
+
 {
 //-------------------------------------SE CONFIGURA EL RELOJ DEL MICROCONTROLADOR A 16MHZ----------------------------------------------
     SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_OSC |   SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
@@ -181,10 +186,10 @@ int main(void)
     PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
     PWMGenEnable(PWM0_BASE, PWM_GEN_0);
 //------------------------------------------------PUERTOS DIGITALES PARA DRIVER PUENTE H------------------------------------------------
-/*    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     SysCtlDelay(3);
     GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, (GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_4));
-*/
+
 //---------------------------------------SE INICIALIZAN UART0----------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -193,7 +198,6 @@ int main(void)
     GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200, UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE );
     UARTStdioConfig(0, 115200, SysCtlClockGet());
-    //QEIPositionSet(QEI0_BASE,360);
 
     while(1)
     {
@@ -219,86 +223,34 @@ int main(void)
 
 //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
         ref11 = (float)((COUNT-100)*3995/(3995-100));
-        ref = 180;//ref11*360/(3995);/*7503*/
+        ref = ref11*360/(3995);/*7503*/
 
-        ref_1=ref;
+
         velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
         out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
-        if((ref-5)>(velocidad))
+
+        if(out.dif > 2)
         {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
         }
-        else if((ref+5)<(velocidad)){
+
+        /*else if(out.dif < -2)
+       {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
         }
-       else if ((ref+5)>(velocidad) && (ref-5)<(velocidad))
+*/
+       else if(out.dif > -2 && out.dif < 2)
         {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
         }
-
-        //control_pid(&out,velocidad,ref);
 
         pulso = (int)out.out;
 
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
-        //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
-        /*if(COUNT<=100){
-            COUNT=100;
-        }
-        else if(COUNT>=3645){
-            COUNT=3995;
-            //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_6|GPIO_PIN_7,0x00);
-            //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-        }
-        if(COUNT>=100 && COUNT<1365){
-            if(COUNT<100){
-                COUNT=100;
-            }
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-            ref11 = (float)((1365-COUNT)*3995/(1365-100));
-            ref = ref11*7503/3995;
-            velocidad=(float)QEIVelocityGet(QEI0_BASE);
-            out = control_pid((velocidad),(ref));
-            int pulso = (int)out;
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
-        }
-        else if(COUNT>=1365 && COUNT<2730){
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-            velocidad = 0;
-        }
-        else if(COUNT>=2730 && COUNT<4095){
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-            out=uk*3995/7503;
-            ref22=(float)((COUNT-2730)*3995/(3995-2730));
-            ref2=ref22*7503/3995;
-            velocidad=(float)QEIVelocityGet(QEI0_BASE);
-            out = control_pid((velocidad),(ref2));
-            int pulso = (int)out;
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
-        }
-        posicio=QEIPositionGet(QEI0_BASE);
-        po=posicio*360/978;
-        direccion=QEIDirectionGet(QEI0_BASE);
-        //float adc=(float)COUNT[0];
-        //UARTprintf("%d \n",(int)adc);
-        float ref_print=(float)ref;
-        float ve=(float)velocidad;
-        float adc=(float)COUNT;
-        UARTprintf("adc: %d \n",(int)adc);
-        UARTprintf("velocidad: %d \n",(int)ve);
-        UARTprintf("ref: %d \n",(int)ref_print);*/
-
-
-        //(u-COTA_INF)*4095/(COTA_SUP-COTA_INF
 
     }
         return 0;
