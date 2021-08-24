@@ -36,7 +36,8 @@ uint32_t prueba;
 unsigned char a0;
 unsigned char a1;
 unsigned char a2;
-unsigned char a3[];
+unsigned char a3;
+unsigned char data[4];
 float mensaje1;
 float mensaje2;
 char n;
@@ -94,37 +95,25 @@ int main(void)
         mensaje1 = (float)COUNT;
         mensaje2 = (float)prueba;
 
-        a0 = (prueba >> 24) & 0xff;  /* high-order (leftmost) byte: bits 24-31 */
-        a1 = (prueba >> 16) & 0xff;  /* next byte, counting from left: bits 16-23 */
-        a2 = (prueba >>  8) & 0xff;  /* next byte, bits 8-15 */
-        a3[] ="ENTRER TEXT: "; //(prueba & 0xff);  /* low-order byte: bits 0-7 */
+        data[0] = (COUNT >> 24) & 0xff;  /* high-order (leftmost) byte: bits 24-31 */
+        data[1] = (COUNT >> 16) & 0xff;  /* next byte, counting from left: bits 16-23 */
+        data[2] = (COUNT >>  8) & 0xff;  /* next byte, bits 8-15 */
+        data[3] = COUNT & 0xff; //(prueba & 0xff);  /* low-order byte: bits 0-7 */
 
         if(n==0)
         {
             UARTCharPut(UART0_BASE,'1');
             n = UARTCharGet(UART0_BASE);
         }
-        else
+        else if(n==1)
         {
-          n=0;
-          //UARTCharPutNonBlocking(UART0_BASE,'r');
-           //UARTSend((uint8_t *)a[3], 4);
-          //UARTCharPutNonBlocking(UART0_BASE,a3);
-          int i =0;
-
-          for(i=0; i<=sizeof(a3[]); i=i+1){
-              UARTCharPut(UART0_BASE,a3++);
-            //  UARTprintf("%d",(int)a3++);
-          }
-         // UARTSend((uint8_t *)a3, 4);
-          //UARTprintf("%d",prueba);
+            int i;
+            for(i=0; i<=3; i++)
+            {
+                UARTCharPut(UART0_BASE,data[i]);
+            }
+            n=0;
         }
-            /*UARTCharPut(UART0_BASE,a[1]);
-            UARTCharPut(UART0_BASE,a[2]);
-            UARTCharPut(UART0_BASE,a[3]);*/
-         /*   n = 0;
-            s=s+1;
-        }*/
 
 
     }
