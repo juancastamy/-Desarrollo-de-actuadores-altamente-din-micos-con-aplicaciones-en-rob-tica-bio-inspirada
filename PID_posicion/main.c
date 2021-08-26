@@ -84,9 +84,9 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     float ek;
     float ed;
     float Ek;
-    float Kp=0.5;
-    float Ki=0.0005;
-    float Kd=0.73;
+    float Kp=0.631;
+    float Ki=0.000005;
+    float Kd=0.82;
     float uk;
     //if (entrada>x)
     //{
@@ -229,20 +229,21 @@ int main(void)
         velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
         out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
-
+        //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+         //           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
         if(out.dif > 2)
         {
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+        }
+
+        else if(out.dif < -5)
+       {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
         }
 
-        /*else if(out.dif < -2)
-       {
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-        }
-*/
-       else if(out.dif > -2 && out.dif < 2)
+        if(out.dif > -5 && out.dif < 5)
         {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
