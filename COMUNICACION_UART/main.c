@@ -107,9 +107,9 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     float ek;
     float ed;
     float Ek;
-    float Kp=0.631;
-    float Ki=0.000005;
-    float Kd=0.82;
+    float Kp=0.09;
+    float Ki=0.0006;
+    float Kd=0.28;
     float uk;
     //if (entrada>x)
     //{
@@ -124,7 +124,7 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     Ek = Ek_1+ek;
     Ek_1=Ek;
     ek_1=ek;
-    uk = Kp*ek + Ki*Ek + Kd*ed ;
+    uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
     giro=uk*(3995)/360;//7503;
 
     resultado.dif = ek;
@@ -217,7 +217,7 @@ int main(void)
        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
         SysCtlDelay(3);
         GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, (GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_4));
-    n=0;
+        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, 100*800/4095);
     while(1)
     {
     //-------------------------------------SE LIMPIA BANDERA DE ADC PARA INICIAR A LEER EL VALOR OBTENIDO--------------------------
@@ -225,12 +225,46 @@ int main(void)
         ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
         while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
         ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
+
+        if(COUNT<=100) //EL VALOR DEL ADC NO PUEDE SER MENOR A 100
+        {
+            COUNT=100;
+        }
+        if(COUNT>=3995) //EL VALOR DEL ADC NO PUEDE SER MENOR A 3995
+        {
+            COUNT=3995;
+        }
+
+
         ref11 = (float)((COUNT-100)*3995/(3995-100));
         ref = ref11*360/(3995);/*7503*/
 
-        prueba = 1000;
-        mensaje1 = (float)COUNT;
-        mensaje2 = (float)prueba;
+        //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
+
+
+
+
+
+
+       //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+        //           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+      /* if(out.dif > 2)
+       {*/
+
+           /*}
+
+       else if(out.dif < -5)
+      {
+           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
+           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
+       }
+
+       if(out.dif > -5 && out.dif < 5)
+       {
+           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
+           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+       }
+*/
 
         data[0] = ((uint32_t)ref >> 24) & 0xff;  /* high-order (leftmost) byte: bits 24-31 */
         data[1] = ((uint32_t)ref >> 16) & 0xff;  /* next byte, counting from left: bits 16-23 */
@@ -242,13 +276,44 @@ int main(void)
         motor[1]=(vel >> 16) & 0xff;
         motor[2]=(vel >> 8) & 0xff;
         motor[3]=vel;
+       n = UARTCharGet(UART0_BASE);
         if(n==0)
         {
             UARTCharPut(UART0_BASE,'1');
             n = UARTCharGet(UART0_BASE);
         }
-        else if(n==1)
+        if(n==1)
         {
+            velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
+            out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
+            pulso = (int)out.out;
+
+            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
+            if(out.dif > 5)
+                   {
+                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+                   }
+
+                   else if(out.dif < -5)
+                  {
+                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
+                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
+                   }
+
+                   if(out.dif > -5 && out.dif < 5)
+                   {
+                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
+                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+                   }
+          /* if (velocidad == 360){
+               GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
+                          GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+           }
+           else{
+               GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
+               GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
+           }*/
             int i;
             for(i=0; i<=3; i++)
             {
@@ -259,46 +324,10 @@ int main(void)
                 UARTCharPut(UART0_BASE,motor[i]);
             }
             n=0;
+
         }
-        if(COUNT<=100) //EL VALOR DEL ADC NO PUEDE SER MENOR A 100
-               {
-                           COUNT=100;
-               }
-               if(COUNT>=3995) //EL VALOR DEL ADC NO PUEDE SER MENOR A 3995
-               {
-                   COUNT=3995;
-               }
-
-       //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
 
 
-
-               velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
-
-               out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
-               //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-                //           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-               if(out.dif > 2)
-               {
-                   GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-                   GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-               }
-
-               else if(out.dif < -5)
-              {
-                   GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
-                   GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-               }
-
-               if(out.dif > -5 && out.dif < 5)
-               {
-                   GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
-                   GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-               }
-
-               pulso = (int)out.out;
-
-               PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
 
 
 
