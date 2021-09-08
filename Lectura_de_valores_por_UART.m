@@ -6,7 +6,19 @@ while(1)
     write(S,0,'char');
     n = read(S,1,'char')
     if n == '1'
+        
         write(S,1,'char');
+        %write(S,180,'char');
+        
+        if count < 1000
+            write(S,180,'char');
+            
+        elseif count>=1000 & count<2000
+            write(S,270,'char');
+        elseif count>=2000 & count<3000
+            write(S,180,'char');
+        end
+        
         data(count,:)=read(S,4,'uint8');
         data2(count,:)=read(S,4,'uint8');
         n=0;

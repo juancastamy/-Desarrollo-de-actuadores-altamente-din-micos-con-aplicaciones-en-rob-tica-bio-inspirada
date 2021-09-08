@@ -44,19 +44,6 @@ float mensaje2;
 char n;
 int s;
 
-UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
-{
-    //
-    // Loop while there are more characters to send.
-    //
-    while(ui32Count--)
-    {
-        //
-        // Write the next character to the UART.
-        //
-        UARTCharPut(UART0_BASE, *pui8Buffer++);
-    }
-}
 #define N 245
 uint32_t COUNT;
 
@@ -90,8 +77,12 @@ float ref11;
 float ref_1;
 int pulso;
 
+float pasado;
+
+struct Filtro pt;
 struct PID_values out;
 
+int fl;
 
 struct PID_values
 {
@@ -101,15 +92,28 @@ struct PID_values
     float ME;//variable para almacenar Ek_1
 };
 
+struct Filtro
+{
+    float pot;
+};
+
+struct Filtro filtrado(float senal, float S, float alpha)
+{
+    struct Filtro potenciometro;
+    s = (alpha*senal)+((1-alpha)*S);
+    potenciometro.pot = s;
+
+    return potenciometro;
+}
 struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, float entrada)
 {
     struct PID_values resultado;
     float ek;
     float ed;
     float Ek;
-    float Kp=0.09;
-    float Ki=0.0006;
-    float Kd=0.28;
+    float Kp=21;//0.2;
+    float Ki=500;//0.007;
+    float Kd=0.25;//0.009;
     float uk;
     //if (entrada>x)
     //{
@@ -125,7 +129,7 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     Ek_1=Ek;
     ek_1=ek;
     uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
-    giro=uk*(3995)/360;//7503;
+    giro=(uk*(3995-100)/360)+100;//7503;
 
     resultado.dif = ek;
     resultado.out = giro;
@@ -235,14 +239,23 @@ int main(void)
             COUNT=3995;
         }
 
+        if (fl==0)
+        {
+            fl=1;
+            pt.pot = COUNT;
+        }
 
-        ref11 = (float)((COUNT-100)*3995/(3995-100));
-        ref = ref11*360/(3995);/*7503*/
+        pt = filtrado(COUNT, pt.pot, 0.05);
+
+
+
+        ref11 = (float)((pt.pot-100)*3995/(3995-100));
+
 
         //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
 
 
-
+        ref = (pt.pot)*360/(3995);/*7503*/
 
 
 
@@ -284,24 +297,25 @@ int main(void)
         }
         if(n==1)
         {
+            //ref =UARTCharGet(UART0_BASE);
             velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
             out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
             pulso = (int)out.out;
 
             PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
-            if(out.dif > 5)
+            if(out.dif > 6)
                    {
                        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
                        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
                    }
 
-                   else if(out.dif < -5)
+                   else if(out.dif < -6)
                   {
                        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
                        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
                    }
 
-                   if(out.dif > -5 && out.dif < 5)
+                   if(out.dif >= -6 && out.dif <= 6)
                    {
                        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
                        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
