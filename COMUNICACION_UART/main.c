@@ -1,18 +1,16 @@
-
-#include "inc/hw_types.h"
-
-#include "inc/hw_gpio.h"
-
-#include "inc/hw_memmap.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include "driverlib/adc.h"
-
 #include "inc/hw_gpio.h"
 #include "inc/hw_types.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_ints.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_gpio.h"
+
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+
+#include "driverlib/adc.h"
 #include "driverlib/fpu.h"
 #include "driverlib/debug.h"
 #include "driverlib/sysctl.h"
@@ -26,63 +24,43 @@
 #include "utils/uartstdio.h"
 #include "uartstdio.h"
 #include "driverlib/qei.h"
-
+#define N 245
 /**
  * main.c
  */
 
 uint32_t COUNT;
-uint32_t prueba;
-unsigned char a0;
-unsigned char a1;
-unsigned char a2;
-unsigned char a3;
-unsigned char data[4];
-unsigned char motor[4];
-float mensaje1;
-float mensaje2;
+//*******************************************************VARIABLE PARA CAMBIO DE GIRO DEL MOTOR***********************************************
+int left;
+int right;
+//******************************************************VARIABLE PARA ALMACENAR EL MENSAJE POR COMUNICACION UART*******************************
+unsigned char data[8];
+
 char n;
 int s;
 
-#define N 245
-uint32_t COUNT;
 
-uint32_t CPU_FREC=16000000;
 uint32_t PWM_FREC=20000;
 uint32_t pwm_word;
-int A;
-int AL=0;
-int NA=0;
-int posicion;
-int B;
-int BL=0;
-int NB=0;
-float po;
-
-/**
- * main.c
- */
 
 
-uint32_t contador=0;
-uint32_t posicio;
+
 float velocidad;
-int32_t direccion;
-uint32_t vel;
+float direccion;
+
 float ref;
-float ref2;
-
-float ref22;
 float ref11;
-float ref_1;
-int pulso;
 
-float pasado;
+float pulso;
+
+int update;
+
+int fl;
+int serial;
 
 struct Filtro pt;
 struct PID_values out;
 
-int fl;
 
 struct PID_values
 {
@@ -111,34 +89,39 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     float ek;
     float ed;
     float Ek;
-    float Kp=21;//0.2;
-    float Ki=500;//0.007;
-    float Kd=0.25;//0.009;
+    float Kp=0.00004;//0.2;//21
+    float Ki=0.002;//0.007;//500;
+    float Kd=0.004;//0.009;//0.25;
     float uk;
-    //if (entrada>x)
-    //{
-        ek = entrada - x;
-    //}
-    /*else
-    {
-        ek = x - entrada;
-    }*/
+
+    ek = entrada - x;
 
     ed = ek - ek_1;
     Ek = Ek_1+ek;
-    Ek_1=Ek;
-    ek_1=ek;
     uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
     giro=(uk*(3995-100)/360)+100;//7503;
 
     resultado.dif = ek;
     resultado.out = giro;
-    resultado.Me = ek_1;
-    resultado.ME = Ek_1;
+    resultado.Me = ek;
+    resultado.ME = Ek;
 
     return resultado;
 
 
+}
+
+
+void Timer0IntHandler(void){
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    update = 1;
+
+}
+
+void UART0IntHandler(void){
+    UARTIntClear(UART0_BASE,UARTIntStatus(UART0_BASE, true)); //se limpia la bandera de la interrupcion
+    n = UARTCharGet(UART0_BASE);//se lee lo que entra al UART0
+    serial=1;
 }
 int main(void)
 {
@@ -153,6 +136,8 @@ int main(void)
     GPIOPinConfigure(GPIO_PA1_U0TX);
     GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), 115200, UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE );
+    IntEnable(INT_UART0);
+    UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
     UARTStdioConfig(0, 115200, SysCtlClockGet());
 //---------------------------------------------CONGIGURACION DEL ADC-------------------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
@@ -167,183 +152,176 @@ int main(void)
     ADCIntEnable(ADC0_BASE, 3);
     //-------------------------------------------ENCODER------------------------------------------------------------------------------------
     //https://forum.43oh.com/topic/7170-using-harware-qei-on-tiva-launchpad/
-        // Enable QEI Peripherals
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
+    // Enable QEI Peripherals
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
 
-        //Unlock GPIOD7 - Like PF0 its used for NMI - Without this step it doesn't work
-        HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY; //In Tiva include this is the same as "_DD" in older versions (0x4C4F434B)
-        HWREG(GPIO_PORTD_BASE + GPIO_O_CR) |= 0x80;
-        HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0;
+    //Unlock GPIOD7 - Like PF0 its used for NMI - Without this step it doesn't work
+    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY; //In Tiva include this is the same as "_DD" in older versions (0x4C4F434B)
+    HWREG(GPIO_PORTD_BASE + GPIO_O_CR) |= 0x80;
+    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0;
 
-        //Set Pins to be PHA0 and PHB0
-        GPIOPinConfigure(GPIO_PD6_PHA0);
-        GPIOPinConfigure(GPIO_PD7_PHB0);
+    //Set Pins to be PHA0 and PHB0
+    GPIOPinConfigure(GPIO_PD6_PHA0);
+    GPIOPinConfigure(GPIO_PD7_PHB0);
 
-        //Set GPIO pins for QEI. PhA0 -> PD6, PhB0 ->PD7. I believe this sets the pull up and makes them inputs
-        GPIOPinTypeQEI(GPIO_PORTD_BASE, GPIO_PIN_6 |  GPIO_PIN_7);
+    //Set GPIO pins for QEI. PhA0 -> PD6, PhB0 ->PD7. I believe this sets the pull up and makes them inputs
+    GPIOPinTypeQEI(GPIO_PORTD_BASE, GPIO_PIN_6 |  GPIO_PIN_7);
 
-        //DISable peripheral and int before configuration
-        QEIDisable(QEI0_BASE);
-        QEIIntDisable(QEI0_BASE,QEI_INTERROR | QEI_INTDIR | QEI_INTTIMER | QEI_INTINDEX);
+    //DISable peripheral and int before configuration
+    QEIDisable(QEI0_BASE);
+    QEIIntDisable(QEI0_BASE,QEI_INTERROR | QEI_INTDIR | QEI_INTTIMER | QEI_INTINDEX);
 
-        // Configure quadrature encoder, use an arbitrary top limit of 1000
-        QEIConfigure(QEI0_BASE, (QEI_CONFIG_CAPTURE_A_B  | QEI_CONFIG_NO_RESET  | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), 978);
+    // Configure quadrature encoder, use an arbitrary top limit of 1000
+    QEIConfigure(QEI0_BASE, (QEI_CONFIG_CAPTURE_A_B  | QEI_CONFIG_NO_RESET  | QEI_CONFIG_QUADRATURE | QEI_CONFIG_NO_SWAP), 978);
 
-        QEIVelocityConfigure(QEI0_BASE,QEI_VELDIV_1,SysCtlClockGet());
-        QEIVelocityEnable(QEI0_BASE);
-        // Enable the quadrature encoder.
-        QEIEnable(QEI0_BASE);
+    QEIVelocityConfigure(QEI0_BASE,QEI_VELDIV_1,SysCtlClockGet());
+    QEIVelocityEnable(QEI0_BASE);
+    // Enable the quadrature encoder.
+    QEIEnable(QEI0_BASE);
 
-        //Set position to a middle value so we can see if things are working
-        QEIPositionSet(QEI0_BASE, 0);
-    //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-        while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
-        GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
-        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
-    //-----------------------------------------------PWM------------------------------------------------------------------------------------
-        pwm_word = (1/PWM_FREC)*CPU_FREC;
-        SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
+    //Set position to a middle value so we can see if things are working
+    QEIPositionSet(QEI0_BASE, 0);
+//--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
+    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
+    GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
+//-----------------------------------------------PWM------------------------------------------------------------------------------------
+    pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
+    SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
 
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);
 
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-        GPIOPinTypePWM(GPIO_PORTB_BASE, GPIO_PIN_6);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    GPIOPinTypePWM(GPIO_PORTB_BASE, GPIO_PIN_6);
 
-        GPIOPinConfigure(GPIO_PB6_M0PWM0);
-        PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
-        PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, 800);
+    GPIOPinConfigure(GPIO_PB6_M0PWM0);
+    PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, pwm_word);
 
-        PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
-        PWMGenEnable(PWM0_BASE, PWM_GEN_0);
-    //------------------------------------------------PUERTOS DIGITALES PARA DRIVER PUENTE H------------------------------------------------
-       SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-        SysCtlDelay(3);
-        GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, (GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_4));
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, 100*800/4095);
+    PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
+    PWMGenEnable(PWM0_BASE, PWM_GEN_0);
+//------------------------------------------------PUERTOS DIGITALES PARA DRIVER PUENTE H------------------------------------------------
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    SysCtlDelay(3);
+    GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, (GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_4));
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, 100*pwm_word/4095);
+
+//---------------------------------------SE ACTIVA EL PERIFERICO DE TIMER0---------------------------------
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+//----------------------------------------INICIALIZACION DEL TIMER 0------------------------------------------
+    TimerConfigure(TIMER0_BASE,TIMER_CFG_PERIODIC);
+//----------------------------------------CONFIGURACION DEL TIEMPO DEL TIMER 0-------------------------------
+    TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet()/100) -1);
+//-----------------------------------------SE ACTIVAN LAS INTERRUPCIONES DEL TIMER0------------------------------------
+
+    IntEnable(INT_TIMER0A);
+    //----------------------------------------SE ACTIVA LAS INTERRUPCIONES DEL TIMER-----------------------------
+    TimerIntEnable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
+
+//----------------------------------------ACTIVAMOS LAS INTERRUPCIONES--------------------------------------
+    IntMasterEnable();
+    TimerEnable(TIMER0_BASE, TIMER_A);
+
     while(1)
     {
-    //-------------------------------------SE LIMPIA BANDERA DE ADC PARA INICIAR A LEER EL VALOR OBTENIDO--------------------------
-        ADCIntClear(ADC0_BASE, 3);
-        ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
-        while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
-        ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
-
-        if(COUNT<=100) //EL VALOR DEL ADC NO PUEDE SER MENOR A 100
+        if(update == 1)
         {
-            COUNT=100;
+            //-------------------------------------SE LIMPIA BANDERA DE ADC PARA INICIAR A LEER EL VALOR OBTENIDO--------------------------
+           ADCIntClear(ADC0_BASE, 3);
+           ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
+           while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
+           ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
+           if(COUNT<=100) //EL VALOR DEL ADC NO PUEDE SER MENOR A 100
+           {
+               COUNT=100;
+           }
+           else if(COUNT>=3995) //EL VALOR DEL ADC NO PUEDE SER MENOR A 3995
+           {
+               COUNT=3995;
+           }
+
+           if (fl==0)
+           {
+               fl=1;
+               pt.pot = COUNT;
+           }
+
+           pt = filtrado(COUNT, pt.pot, 0.05);
+
+           ref11 = (float)((pt.pot-100)*3995/(3995-100));
+
+           ref = (ref11)*360/(3995);/*7503*/
+
+           velocidad = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
+           direccion = (QEIDirectionGet(QEI0_BASE)*360/979.2);
+           out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
+           update = 0;
         }
-        if(COUNT>=3995) //EL VALOR DEL ADC NO PUEDE SER MENOR A 3995
+        pulso = out.out;
+
+        if(out.dif > 6 && out.dif > -6)
         {
-            COUNT=3995;
+           right = 1;
+           left = 0;
         }
-
-        if (fl==0)
+        else if(out.dif < -6 && out.dif < 6)
         {
-            fl=1;
-            pt.pot = COUNT;
+           right = 0;
+           left = 1;
+        }
+        else
+        {
+            right=0;
+            left=0;
         }
 
-        pt = filtrado(COUNT, pt.pot, 0.05);
+        if(right == 1 && left == 0)
+        {
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+        }
+        else if(right == 0 && left == 1)
+        {
+           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
+           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
+        }
+        else if (right == 0 && left == 0)
+        {
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+        }
 
 
-
-        ref11 = (float)((pt.pot-100)*3995/(3995-100));
-
-
-        //--------------------------------SE REALIZA MAPEO AL VALOR DEL ADC OBTENIDO PARA MANTENERLO DENTRO DEL VALOR DE 100-3995---------
+        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);
 
 
-        ref = (pt.pot)*360/(3995);/*7503*/
-
-
-
-       //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-        //           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-      /* if(out.dif > 2)
-       {*/
-
-           /*}
-
-       else if(out.dif < -5)
-      {
-           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
-           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-       }
-
-       if(out.dif > -5 && out.dif < 5)
-       {
-           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
-           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-       }
-*/
-
-        data[0] = ((uint32_t)ref >> 24) & 0xff;  /* high-order (leftmost) byte: bits 24-31 */
-        data[1] = ((uint32_t)ref >> 16) & 0xff;  /* next byte, counting from left: bits 16-23 */
-        data[2] = ((uint32_t)ref >>  8) & 0xff;  /* next byte, bits 8-15 */
-        data[3] = (uint32_t)ref & 0xff; //(prueba & 0xff);  /* low-order byte: bits 0-7 */
-
-        vel=(QEIPositionGet(QEI0_BASE)*360/979.2);
-        motor[0]=(vel >> 24) & 0xff;
-        motor[1]=(vel >> 16) & 0xff;
-        motor[2]=(vel >> 8) & 0xff;
-        motor[3]=vel;
-       n = UARTCharGet(UART0_BASE);
-        if(n==0)
+        data[0] = ((uint32_t)ref >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31
+        data[1] = ((uint32_t)ref >> 16) & 0xff;  //next byte, counting from left: bits 16-23
+        data[2] = ((uint32_t)ref >>  8) & 0xff;  // next byte, bits 8-15
+        data[3] = (uint32_t)ref & 0xff; //(prueba & 0xff);  //low-order byte: bits 0-7
+        data[4]=((uint32_t)velocidad >> 24) & 0xff;
+        data[5]=((uint32_t)velocidad >> 16) & 0xff;
+        data[6]=((uint32_t)velocidad >> 8) & 0xff;
+        data[7]=(uint32_t)velocidad;
+        if(serial==0){
+            UARTCharPut(UART0_BASE,'6');
+        }
+        if (n ==1)
         {
             UARTCharPut(UART0_BASE,'1');
-            n = UARTCharGet(UART0_BASE);
-        }
-        if(n==1)
-        {
-            //ref =UARTCharGet(UART0_BASE);
-            velocidad=(float)(QEIPositionGet(QEI0_BASE)*360/979.2);
-            out = control_pid (out.out, out.Me, out.ME, velocidad, ref);
-            pulso = (int)out.out;
 
-            PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*800/4095);
-            if(out.dif > 6)
-                   {
-                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-                   }
-
-                   else if(out.dif < -6)
-                  {
-                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_6,GPIO_PIN_6);
-                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5,0x00);
-                   }
-
-                   if(out.dif >= -6 && out.dif <= 6)
-                   {
-                       GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
-                       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-                   }
-          /* if (velocidad == 360){
-               GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);
-                          GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-           }
-           else{
-               GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);
-               GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);
-           }*/
-            int i;
-            for(i=0; i<=3; i++)
-            {
-                UARTCharPut(UART0_BASE,data[i]);
-            }
-            for(i=0; i<=3; i++)
-            {
-                UARTCharPut(UART0_BASE,motor[i]);
-            }
+            UARTCharPut(UART0_BASE,data[0]);
+            UARTCharPut(UART0_BASE,data[1]);
+            UARTCharPut(UART0_BASE,data[2]);
+            UARTCharPut(UART0_BASE,data[3]);
+            UARTCharPut(UART0_BASE,data[4]);
+            UARTCharPut(UART0_BASE,data[5]);
+            UARTCharPut(UART0_BASE,data[6]);
+            UARTCharPut(UART0_BASE,data[7]);
             n=0;
-
         }
-
-
-
-
 
     }
 	return 0;
