@@ -1,0 +1,19 @@
+
+**** Build of configuration Debug for project COMUNICACION_UART ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/COMUNICACION_UART" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 327: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "COMUNICACION_UART.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"COMUNICACION_UART.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="COMUNICACION_UART_linkInfo.xml" --rom_model -o "COMUNICACION_UART.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "./uartstdio.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "COMUNICACION_UART.out"
+ 
+
+**** Build Finished ****
