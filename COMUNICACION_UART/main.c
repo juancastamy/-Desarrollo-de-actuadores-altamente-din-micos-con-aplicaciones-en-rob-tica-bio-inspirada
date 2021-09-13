@@ -89,7 +89,7 @@ struct PID_values control_pid (float giro, float ek_1, float Ek_1, float x, floa
     float ek;
     float ed;
     float Ek;
-    float Kp=0.00004;//0.2;//21
+    float Kp=0.00003;//0.2;//21
     float Ki=0.002;//0.007;//500;
     float Kd=0.004;//0.009;//0.25;
     float uk;
@@ -181,7 +181,7 @@ int main(void)
     QEIEnable(QEI0_BASE);
 
     //Set position to a middle value so we can see if things are working
-    QEIPositionSet(QEI0_BASE, 0);
+    QEIPositionSet(QEI0_BASE, 10*0.03491);
 //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
@@ -233,26 +233,17 @@ int main(void)
            ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
            while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
            ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
-           if(COUNT<=100) //EL VALOR DEL ADC NO PUEDE SER MENOR A 100
-           {
-               COUNT=100;
-           }
-           else if(COUNT>=3995) //EL VALOR DEL ADC NO PUEDE SER MENOR A 3995
-           {
-               COUNT=3995;
-           }
 
            if (fl==0)
            {
                fl=1;
                pt.pot = COUNT;
            }
-
            pt = filtrado(COUNT, pt.pot, 0.05);
 
-           ref11 = (float)((pt.pot-100)*3995/(3995-100));
+           ref11 = (float)((0.95116*pt.pot)+100);
 
-           ref = (ref11)*360/(3995);/*7503*/
+           ref = 0.08511*(ref11-100)+10;/*7503*/
 
            velocidad = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
            direccion = (QEIDirectionGet(QEI0_BASE)*360/979.2);
@@ -293,6 +284,14 @@ int main(void)
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
         }
 
+        if(out.out < 0)
+        {
+            out.out = -out.out;
+        }
+        else
+        {
+            out.out = out.out;
+        }
 
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);
 

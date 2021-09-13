@@ -2,11 +2,11 @@ clear all;
 %% CONFIGURACION PARA HABILITAR LA COMUNICACION SERIAL 
 S = serialport('COM7', 115200);
 count = 1;
-s=read(S,1,'uint8')
+s=read(S,1,'uint8');
 while(1)
-    write(S,1,'uint8');
-    n = read(S,1,'uint8');
-    if n == 1   
+    write(S,1,'char');
+    n = read(S,1,'char')
+    if n == '1'   
         data(count,:)=read(S,8,'uint8');
         n=0;        
         count = count+1
@@ -22,7 +22,7 @@ while(1)
         plot(data_real);
 
         plot(data_real2);
-        legend({'referencia','motor'},'Location','northeast')
+        legend({'Potenciometro',''},'Location','northeast')
         break;
     end
 end

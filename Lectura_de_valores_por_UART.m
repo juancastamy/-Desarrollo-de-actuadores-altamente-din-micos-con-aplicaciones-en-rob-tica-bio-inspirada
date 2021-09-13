@@ -22,7 +22,7 @@ while(1)
         plot(data_real);
 
         plot(data_real2);
-        legend({'referencia','motor'},'Location','northeast')
+        legend({'Potenciometro','Potenciometro filtrado'},'Location','northeast')
         break;
     end
 end
