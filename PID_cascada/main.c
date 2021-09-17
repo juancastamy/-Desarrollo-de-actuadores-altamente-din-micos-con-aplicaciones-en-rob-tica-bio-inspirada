@@ -61,6 +61,8 @@ int update;
 int fl;
 int serial;
 
+int BOTON;
+
 struct Filtro pt;
 struct PID_values out;
 
@@ -97,27 +99,29 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     float ek;
     float ed;
     float Ek;
+    float dif;
     /*float Kp=0.00003;//0.2;//21
     float Ki=0.002;//0.007;//500;
     float Kd=0.004;//0.009;//0.25;*/
 
 
-    ek = entrada - x;
+    dif = entrada - x;
 
+    ek=abs(dif);
     ed = ek - ek_1;
     Ek = Ek_1+ek;
     uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
 
     if (n==0)
     {
-        resultado.difp = ek;
+        resultado.difp = dif;
         resultado.outp = uk;
         resultado.Mep = ek;
         resultado.MEp = Ek;
     }
     else
     {
-        resultado.difv = ek;
+        resultado.difv = dif;
         resultado.outv = uk;
         resultado.Mev = ek;
         resultado.MEv = Ek;
@@ -140,6 +144,7 @@ void UART0IntHandler(void){
     n = UARTCharGet(UART0_BASE);//se lee lo que entra al UART0
     serial=1;
 }
+
 int main(void)
 {
 //----------------------------------------INICIALIZACION DEL RELOJ-------------------------------------------
@@ -198,7 +203,7 @@ int main(void)
     QEIEnable(QEI0_BASE);
 
     //Set position to a middle value so we can see if things are working
-    QEIPositionSet(QEI0_BASE, 10*0.03491);
+    QEIPositionSet(QEI0_BASE, 28);
 //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
@@ -241,6 +246,12 @@ int main(void)
     IntMasterEnable();
     TimerEnable(TIMER0_BASE, TIMER_A);
 
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+    GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_4);
+    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_8MA, GPIO_PIN_TYPE_STD_WPU);
+ref = 10;
+
     while(1)
     {
         if(update == 1)
@@ -258,30 +269,65 @@ int main(void)
            }
            pt = filtrado(COUNT, pt.pot, 0.05);
 
-           ref11 = (float)((0.95116*pt.pot)+100);
+           ref11 = (float)(0.08791*pt.pot);
 
-           ref = 0.0872913*(ref11-100)+10;/*7503*/
+           if (ref11 >= 350)
+           {
+               ref = 350;
+           }
+           else if (ref11 <=10)
+           {
+               ref = 10;
+           }
+
+           else
+           {
+               ref = ref11;
+           }
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
-           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,0.00003,0.002,0.004,0);
 
-           giro=(float)(out.outp * 11.4559)+100;//7503;
+           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,1,0.00,0.025,0);
+
+           giro=(float)(abs(out.outp*((3995-545)/360)+545));
+
 
            ref22 = (float)((7.94898 * giro) + 100);
+
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
            out = control_pid (out.outv, out.Mev, out.MEv, posicion, ref22,9.719,0.8169,0.00155,1);
 
            ref2= 0.1258 * (out.outv-100);
            update = 0;
         }
-        pulso = ref2;
+     /* if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
+       {
+           BOTON=1;
+       }
+       if(BOTON==1)
+       {
+           ref=180;
+       }*/
+        if (giro >= 3995)
+        {
+            giro = 3995;
+        }
+        else if (giro <= 545)
+        {
+            giro = 545;
+        }
 
-        if(out.difp > 6 && out.difp > -6)
+
+        pulso = giro;
+
+
+
+       if(out.difp > 1 && out.difp > -1)
         {
            right = 1;
            left = 0;
         }
-        else if(out.difp < -6 && out.difp < 6)
+        else if(out.difp < -1 && out.difp < 1)
         {
            right = 0;
            left = 1;
@@ -294,7 +340,7 @@ int main(void)
 
         if(right == 1 && left == 0)
         {
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
         }
         else if(right == 0 && left == 1)
@@ -316,10 +362,10 @@ int main(void)
         data[1] = ((uint32_t)ref >> 16) & 0xff;  //next byte, counting from left: bits 16-23
         data[2] = ((uint32_t)ref >>  8) & 0xff;  // next byte, bits 8-15
         data[3] = (uint32_t)ref & 0xff; //(prueba & 0xff);  //low-order byte: bits 0-7
-        data[4]=((uint32_t)velocidad >> 24) & 0xff;
-        data[5]=((uint32_t)velocidad >> 16) & 0xff;
-        data[6]=((uint32_t)velocidad >> 8) & 0xff;
-        data[7]=(uint32_t)velocidad;
+        data[4]=((uint32_t)posicion >> 24) & 0xff;
+        data[5]=((uint32_t)posicion >> 16) & 0xff;
+        data[6]=((uint32_t)posicion >> 8) & 0xff;
+        data[7]=(uint32_t)posicion;
         if(serial==0){
             UARTCharPut(UART0_BASE,'6');
         }
