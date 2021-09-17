@@ -3863,3 +3863,31 @@ Unable to communicate with the device. Please check your connection.
 !ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:04:34.537
 !MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_cascada\Debug\PID_cascada.out Could not open file
 
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:13:20.554
+!MESSAGE DS_ERROR: CORTEX_M4_0: GEL: Encountered a problem loading file: C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\PID_cascada\Debug\PID_cascada.out Could not open file
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:15:06.747
+!MESSAGE DS_ERROR: CORTEX_M4_0: Trouble Reading Memory Block at 0x20000264 on Page 0 of Length 0x4: Debug Port error occurred.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:15:06.750
+!MESSAGE DS_ERROR: CORTEX_M4_0: Trouble Halting Target CPU 
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:15:06.753
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Debug Port error occurred.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 00:15:06.755
+!MESSAGE DS_ERROR: CORTEX_M4_0: Trouble Halting Target CPU 
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 01:30:41.752
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error connecting to the target: Unable to communicate with the device. Please check your connection.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2021-09-17 01:30:41.989
+!MESSAGE DS_ERROR: Error connecting to the target:
+Unable to communicate with the device. Please check your connection.

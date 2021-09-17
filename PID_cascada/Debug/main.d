@@ -29,6 +29,7 @@ main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/interrupt.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/uart.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/utils/uartstdio.h
 main.obj: C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include/stdarg.h
+main.obj: ../CONFIG.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/qei.h
 
 ../main.c: 
@@ -60,4 +61,5 @@ C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/interrupt.h:
 C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/uart.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/utils/uartstdio.h: 
 C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include/stdarg.h: 
+../CONFIG.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/qei.h: 

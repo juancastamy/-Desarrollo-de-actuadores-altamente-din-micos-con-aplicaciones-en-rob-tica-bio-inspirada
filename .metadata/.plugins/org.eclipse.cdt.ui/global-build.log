@@ -16608,3 +16608,230 @@ Finished building target: "PID_cascada.out"
  
 
 **** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+ 
+>> Compilation failure
+subdir_rules.mk:9: recipe for target 'main.obj' failed
+"../main.c", line 297: error #18: expected a ")"
+"../main.c", line 386: warning #112-D: statement is unreachable
+1 error detected in the compilation of "../main.c".
+gmake: *** [main.obj] Error 1
+gmake: Target 'all' not remade because of errors.
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../CONFIG.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="CONFIG.d_raw"  "../CONFIG.c"
+Finished building: "../CONFIG.c"
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 386: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./CONFIG.obj" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+ 
+>> Compilation failure
+subdir_rules.mk:9: recipe for target 'main.obj' failed
+"../main.c", line 155: warning #225-D: function "CONFIG" declared implicitly
+"../main.c", line 254: error #20: identifier "pwm_word" is undefined
+"../main.c", line 284: warning #112-D: statement is unreachable
+1 error detected in the compilation of "../main.c".
+gmake: *** [main.obj] Error 1
+Building file: "../CONFIG.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="CONFIG.d_raw"  "../CONFIG.c"
+Finished building: "../CONFIG.c"
+ 
+gmake: Target 'all' not remade because of errors.
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 155: warning #225-D: function "CONFIG" declared implicitly
+"../main.c", line 286: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./CONFIG.obj" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+Building file: "../main.c"
+Invoking: Arm Compiler
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/Users/juan/Documents/GitHub/Proyecto_de_Graduacion/PID_cascada" --include_path="C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="main.d_raw"  "../main.c"
+"../main.c", line 286: warning #112-D: statement is unreachable
+Finished building: "../main.c"
+ 
+Building target: "PID_cascada.out"
+Invoking: Arm Linker
+"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C123_RB1 --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PID_cascada.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/lib" -i"C:/ti/ccs1000/ccs/tools/compiler/ti-cgt-arm_20.2.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PID_cascada_linkInfo.xml" --rom_model -o "PID_cascada.out" "./CONFIG.obj" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -llibc.a 
+<Linking>
+Finished building target: "PID_cascada.out"
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project PID_cascada ****
+
+"C:\\ti\\ccs1000\\ccs\\utils\\bin\\gmake" -k -j 4 all -O 
+ 
+gmake[1]: 'PID_cascada.out' is up to date.
+
+**** Build Finished ****
