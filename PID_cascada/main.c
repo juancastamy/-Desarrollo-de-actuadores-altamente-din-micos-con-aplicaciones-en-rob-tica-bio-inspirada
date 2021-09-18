@@ -90,7 +90,6 @@ struct Filtro filtrado(float senal, float S, float alpha)
     struct Filtro potenciometro;
     s = (alpha*senal)+((1-alpha)*S);
     potenciometro.pot = s;
-
     return potenciometro;
 }
 
@@ -101,10 +100,6 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     float ek;
     float ed;
     float Ek;
-    float dif;
-    /*float Kp=0.00003;//0.2;//21
-    float Ki=0.002;//0.007;//500;
-    float Kd=0.004;//0.009;//0.25;*/
     if (n==0)
     {
         ek = entrada - x;
@@ -198,33 +193,31 @@ int main(void)
 
            ref11 = (float)(0.08791*pt.pot);
 
-           if (ref11 >= 350)
+           if (ref11 >= 350 && BOTON==0)
            {
                ref = 350;
            }
-           else if (ref11 <=10)
+           else if (ref11 <=10 && BOTON==0)
            {
                ref = 10;
            }
 
            else
            {
-              ref = ref11;
+               ref = ref11;
            }
 
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
-          out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,1,00.000035,1.75,0);
+           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.5,1.75,0);
 
-          giro=(float)(abs(out.outp* 11.375));
+           giro=(float)(abs(out.outp* 11.375));
 
-          ref22 = (float)(abs(giro*0.1221));
-         // ref22=(float)(pt.pot*0.1221);
-          velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
+           ref22 = (float)(abs(giro*0.1221));
 
-
-          out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, /*2*//*5*/5, /*0.09*/0.5,0.00000, 1);
+           velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
+           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, /*2*//*5*/5, /*0.09*/0.5,0.00000, 1);
 
 
 
@@ -234,10 +227,7 @@ int main(void)
         {
             BOTON=1;
         }
-        if(BOTON==1)
-        {
-            ref=350;
-        }
+
 
 
         if (giro > 4095)
@@ -249,6 +239,7 @@ int main(void)
             giro = 0;
         }
         rev=(float)((out.outv)*8.19);
+
         if (rev<10)
         {
             rev = 10;
