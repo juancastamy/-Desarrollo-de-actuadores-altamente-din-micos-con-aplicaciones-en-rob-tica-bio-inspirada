@@ -34,7 +34,7 @@ uint32_t COUNT;
 int left;
 int right;
 //******************************************************VARIABLE PARA ALMACENAR EL MENSAJE POR COMUNICACION UART*******************************
-unsigned char data[8];
+unsigned char data[16];
 
 char n;
 int s;
@@ -77,12 +77,12 @@ struct PID_values
     float outv;//variable para almacenar giro
     float Mev;//variable para almacenar ek_1
     float MEv;//variable para almacenar Ek_1
-
 };
 
 struct Filtro
 {
     float pot;
+
 };
 
 struct Filtro filtrado(float senal, float S, float alpha)
@@ -93,6 +93,8 @@ struct Filtro filtrado(float senal, float S, float alpha)
 
     return potenciometro;
 }
+
+
 struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float entrada, float Kp, float Ki, float Kd, int n)
 {
     struct PID_values resultado;
@@ -105,14 +107,14 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     float Kd=0.004;//0.009;//0.25;*/
     if (n==0)
     {
-        dif = entrada - x;
+        ek = entrada - x;
 
-        ek=abs(dif);
+        //ek=abs(dif);
         ed = ek - ek_1;
         Ek = Ek_1+ek;
         uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
 
-        resultado.difp = dif;
+        resultado.difp = ek;
         resultado.outp = uk;
         resultado.Mep = ek;
         resultado.MEp = Ek;
@@ -147,11 +149,33 @@ void UART0IntHandler(void){
     serial=1;
 }
 
+
+
+void direccion(float dir)
+{
+    if(dir >= 2 )
+    {
+        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+    }
+    else if (dir <= -2)
+    {
+        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
+    }
+    else
+    {
+        GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+    }
+}
+
+
 int main(void)
 {
 
-ref = 10;
-
+    ref = 10;
+    out.outp=5;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
 
@@ -185,77 +209,61 @@ ref = 10;
 
            else
            {
-               ref = ref11;
+              ref = ref11;
            }
+
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
-           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,0.7,0.002,0.025,0);
+          out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,1,00.000035,1.75,0);
 
-           //giro=(float)(abs((out.outp* 10.54166)+200));
+          giro=(float)(abs(out.outp* 11.375));
 
-           ref22 = (float)(abs(out.outp* 9.583333) + 545);
-
-           //ref22 = (float)(0.131752 * (giro -200));
-
-           velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
-
-           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, /*2*/0.5, /*0.09*/0.09, 0.000, 1);
+          ref22 = (float)(abs(giro*0.1221));
+         // ref22=(float)(pt.pot*0.1221);
+          velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
 
 
-           update = 0;
+          out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, /*2*//*5*/5, /*0.09*/0.5,0.00000, 1);
+
+
+
+          update = 0;
         }
-     /* if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
-       {
-           BOTON=1;
-       }
-       if(BOTON==1)
-       {
-           ref=180;
-       }*/
-
-        //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
-       // GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
-        rev=(float)(abs((out.outv* 7.59)+200));
-        pulso = ref22;
-
-
-
-       if(out.difp > 1 && out.difp > -1)
+        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
         {
-           right = 1;
-           left = 0;
+            BOTON=1;
         }
-        else if(out.difp < -1 && out.difp < 1)
+        if(BOTON==1)
         {
-           right = 0;
-           left = 1;
-        }
-        else
-        {
-            right=0;
-            left=0;
+            ref=350;
         }
 
-        if(right == 1 && left == 0)
-        {
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
-        }
-        else if(right == 0 && left == 1)
-        {
-           GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
-           GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
-        }
-        else if (right == 0 && left == 0)
-        {
-            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
-        }
 
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);
+        if (giro > 4095)
+        {
+            giro = 4095;
+        }
+        else if (giro < 0)
+        {
+            giro = 0;
+        }
+        rev=(float)((out.outv)*8.19);
+        if (rev<10)
+        {
+            rev = 10;
+        }
+        else if (rev>3995)
+        {
+            rev=3995;
+        }
+        pulso = rev;
 
+        direccion(out.outp);
 
+        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, rev*pwm_word/4095);
+
+//***************************************************************ENVIO DATOS DE POSICION**********************************************
         data[0] = ((uint32_t)ref >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31
         data[1] = ((uint32_t)ref >> 16) & 0xff;  //next byte, counting from left: bits 16-23
         data[2] = ((uint32_t)ref >>  8) & 0xff;  // next byte, bits 8-15
@@ -264,6 +272,15 @@ ref = 10;
         data[5]=((uint32_t)posicion >> 16) & 0xff;
         data[6]=((uint32_t)posicion >> 8) & 0xff;
         data[7]=(uint32_t)posicion;
+//*******************************************************ENVIO DATOS VELOCIDAD*********************************************************
+        data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31
+        data[9] = ((uint32_t)ref22 >> 16) & 0xff;  //next byte, counting from left: bits 16-23
+        data[10] = ((uint32_t)ref22 >>  8) & 0xff;  // next byte, bits 8-15
+        data[11] = (uint32_t)ref22 & 0xff; //(prueba & 0xff);  //low-order byte: bits 0-7
+        data[12]=((uint32_t)velocidad >> 24) & 0xff;
+        data[13]=((uint32_t)velocidad >> 16) & 0xff;
+        data[14]=((uint32_t)velocidad >> 8) & 0xff;
+        data[15]=(uint32_t)velocidad;
         if(serial==0){
             UARTCharPut(UART0_BASE,'6');
         }
@@ -279,6 +296,15 @@ ref = 10;
             UARTCharPut(UART0_BASE,data[5]);
             UARTCharPut(UART0_BASE,data[6]);
             UARTCharPut(UART0_BASE,data[7]);
+
+            UARTCharPut(UART0_BASE,data[8]);
+            UARTCharPut(UART0_BASE,data[9]);
+            UARTCharPut(UART0_BASE,data[10]);
+            UARTCharPut(UART0_BASE,data[11]);
+            UARTCharPut(UART0_BASE,data[12]);
+            UARTCharPut(UART0_BASE,data[13]);
+            UARTCharPut(UART0_BASE,data[14]);
+            UARTCharPut(UART0_BASE,data[15]);
             n=0;
         }
 
