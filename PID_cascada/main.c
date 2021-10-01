@@ -173,7 +173,8 @@ int main(void)
     out.outp=5;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
-
+    GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     while(1)
     {
         if(update == 1)
@@ -193,6 +194,7 @@ int main(void)
 
            ref11 = (float)(0.08791*pt.pot);
 
+
            if (ref11 >= 350 && BOTON==0)
            {
                ref = 350;
@@ -210,14 +212,14 @@ int main(void)
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
 
-           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.5,1.75,0);
-
-           giro=(float)(abs(out.outp* 11.375));
+           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.5,1.5,0);//PID para control solo de posicion
+           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,3.5,0.000005,1.75,0);//PID para control en cascada
+           giro=(float)(abs(out.outp)* 11.375);
 
            ref22 = (float)(abs(giro*0.1221));
-
+           //ref22=(float)(pt.pot *0.1221);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
-           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, /*2*//*5*/5, /*0.09*/0.5,0.00000, 1);
+           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, 5, 0.5, 0, 1);
 
 
 
@@ -230,9 +232,9 @@ int main(void)
 
 
 
-        if (giro > 4095)
+        if (giro > 3995)
         {
-            giro = 4095;
+            giro = 3995;
         }
         else if (giro < 0)
         {
@@ -250,9 +252,9 @@ int main(void)
         }
         pulso = rev;
 
-        direccion(out.outp);
-
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, rev*pwm_word/4095);
+        direccion(out.difp);
+        //ref=4095;
+        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);
 
 //***************************************************************ENVIO DATOS DE POSICION**********************************************
         data[0] = ((uint32_t)ref >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31

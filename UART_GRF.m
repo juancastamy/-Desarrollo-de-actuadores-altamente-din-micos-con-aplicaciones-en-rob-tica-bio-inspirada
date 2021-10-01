@@ -9,7 +9,7 @@ dt = 0.01;
 t0 = 0;
 tf = 48.98;
 k=(tf-t0)/dt;
-t = t0:dt:48.96;
+t = t0:0.01:48.96;
 t1=t';
 while(1)
     write(S,1,'char');
@@ -33,14 +33,15 @@ while(1)
 
         plot(t1,data_real2')
         
-        legend({'ref pos','pos'},'Location','northeast')
+        legend({'Ref posición','Posición motor'},'Location','northeast','FontSize',15);
+        
         figure(2);clf;
         hold on;
         plot(t1,data_real3');
 
         plot(t1,data_real4')
         
-        legend({'ref vel','vel'},'Location','northeast')
+        legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
         break;
     end
 end
