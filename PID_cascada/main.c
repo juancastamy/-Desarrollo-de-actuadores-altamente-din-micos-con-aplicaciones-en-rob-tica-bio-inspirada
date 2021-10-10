@@ -28,7 +28,7 @@
 /**
  * main.c
  */
-
+uint32_t feedfoward;
 uint32_t COUNT;
 //*******************************************************VARIABLE PARA CAMBIO DE GIRO DEL MOTOR***********************************************
 int left;
@@ -104,7 +104,6 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     {
         ek = entrada - x;
 
-        //ek=abs(dif);
         ed = ek - ek_1;
         Ek = Ek_1+ek;
         uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
@@ -127,8 +126,6 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     }
 
     return resultado;
-
-
 }
 
 
@@ -148,12 +145,12 @@ void UART0IntHandler(void){
 
 void direccion(float dir)
 {
-    if(dir >= 2 )
+    if(dir >= 1 )
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     }
-    else if (dir <= -2)
+    else if (dir <= -1)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
@@ -170,7 +167,7 @@ int main(void)
 {
 
     ref = 10;
-    out.outp=5;
+    //out.outp=5;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
     GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
@@ -220,6 +217,8 @@ int main(void)
            //ref22=(float)(pt.pot *0.1221);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
            out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, 5, 0.5, 0, 1);
+           //******************************************FEEDFOWARD***********************************************************
+           feedfoward = (ref22 - 24.957)*8.1967;
 
 
 
@@ -240,7 +239,7 @@ int main(void)
         {
             giro = 0;
         }
-        rev=(float)((out.outv)*8.19);
+        rev=(float)((out.outv*8.19) + feedfoward);
 
         if (rev<10)
         {
@@ -252,31 +251,60 @@ int main(void)
         }
         pulso = rev;
 
-        direccion(out.difp);
-        //ref=4095;
-        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);
+        direccion(out.difp);//se selecciona la direccion en la que el motor gira
 
-//***************************************************************ENVIO DATOS DE POSICION**********************************************
-        data[0] = ((uint32_t)ref >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31
-        data[1] = ((uint32_t)ref >> 16) & 0xff;  //next byte, counting from left: bits 16-23
-        data[2] = ((uint32_t)ref >>  8) & 0xff;  // next byte, bits 8-15
-        data[3] = (uint32_t)ref & 0xff; //(prueba & 0xff);  //low-order byte: bits 0-7
-        data[4]=((uint32_t)posicion >> 24) & 0xff;
-        data[5]=((uint32_t)posicion >> 16) & 0xff;
-        data[6]=((uint32_t)posicion >> 8) & 0xff;
-        data[7]=(uint32_t)posicion;
+        PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
+
+//****************************************************PREPARACION PARA ENVIO DE DATOS POSICION**********************************************
+        data[0] = ((uint32_t)ref >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de posicion y se almacenan en la primera
+                                                 //posicion del array data
+
+        data[1] = ((uint32_t)ref >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de posicion y se almacenan en la segunda
+                                                 //posicion del array data
+
+        data[2] = ((uint32_t)ref >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de posicion y se almacenan en la tercera
+                                                 //posicion del array data
+
+        data[3] = (uint32_t)ref & 0xff; //se extrae los bits 0-7 de la señal de referencia de posicion y se almacenan en la cuarta
+                                        //posicion del array data
+
+        data[4] = ((uint32_t)posicion >> 24) & 0xff; //se extrae los bits 24-31 de la señal de posicion del encoder y se almacenan en la quinta
+                                                     //posicion del array data
+
+        data[5] = ((uint32_t)posicion >> 16) & 0xff; //se extrae los bits 16-23 de la señal de posicion del encoder y se almacenan en la sexta
+                                                     //posicion del array data
+
+        data[6] = ((uint32_t)posicion >> 8) & 0xff; //se extrae los bits 8-15 de la señal de posicion del encoder y se almacenan en la septima
+                                                    //posicion del array data
+
+        data[7] = (uint32_t)posicion; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
+                                      //posicion del array data
 //*******************************************************ENVIO DATOS VELOCIDAD*********************************************************
-        data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //high-order (leftmost) byte: bits 24-31
-        data[9] = ((uint32_t)ref22 >> 16) & 0xff;  //next byte, counting from left: bits 16-23
-        data[10] = ((uint32_t)ref22 >>  8) & 0xff;  // next byte, bits 8-15
-        data[11] = (uint32_t)ref22 & 0xff; //(prueba & 0xff);  //low-order byte: bits 0-7
-        data[12]=((uint32_t)velocidad >> 24) & 0xff;
-        data[13]=((uint32_t)velocidad >> 16) & 0xff;
-        data[14]=((uint32_t)velocidad >> 8) & 0xff;
-        data[15]=(uint32_t)velocidad;
+        data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena
+                                                   //posicion del array data
+
+        data[9] = ((uint32_t)ref22 >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de velocidad y se almacenan en la decima
+                                                   //posicion del array data
+
+        data[10] = ((uint32_t)ref22 >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de velocidad y se almacenan en la onceaba
+                                                    //posicion del array data
+
+        data[11] = (uint32_t)ref22 & 0xff; //se extrae los bits 0-7 de la señal de referencia de velocidad y se almacenan en la doceaba
+                                           //posicion del array data
+
+        data[12]=((uint32_t)velocidad >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba
+                                                     //posicion del array data
+        data[13]=((uint32_t)velocidad >> 16) & 0xff; //se extrae los bits 16-23 de la señal de velocidad del encoder y se almacenan en la catorceaba
+                                                     //posicion del array data
+        data[14]=((uint32_t)velocidad >> 8) & 0xff; //se extrae los bits 8-15 de la señal de velocidad del encoder y se almacenan en la quinceaba
+                                                    //posicion del array data
+        data[15]=(uint32_t)velocidad; //se extrae los bits 0-8 de la señal de velocidad del encoder y se almacenan en la diez y seisaba
+                                      //posicion del array data
+
         if(serial==0){
             UARTCharPut(UART0_BASE,'6');
         }
+//*******************************SI SE RECIVE EL VALOR DE n=1 DEL UART SE INICIA A ENVIAR TODOS LOS DATOS EN ORDEN*******************************************
         if (n ==1)
         {
             UARTCharPut(UART0_BASE,'1');
