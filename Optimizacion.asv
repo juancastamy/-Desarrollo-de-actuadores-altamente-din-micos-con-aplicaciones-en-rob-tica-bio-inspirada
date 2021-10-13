@@ -1,22 +1,22 @@
 clear all;
 load('DATAREAL.mat')
-Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01];
-lb = zeros(1,7);
-ub = [10,0.01,inf,inf,inf,inf,inf];
+syms z1 z2 z3 z4 z5 z6 z7
+%syms X [3 3] matrix
+Z = [z1; z2; z3; z4; z5; z6; z7];
+x0 = [0;0;0];
+u0=0;
+
+x = [zeros(1,1916);data_Real3';data_Real2']; % vector de estado 
+u = data_Real';
+%u = u0; % vector de entradas
 %% Parámetros de la simulación
 t0 = 0;
 tf = 19.16; % tiempo de simulación
-dt = 0.01;
+dt = 0.01; % tiempo de muestreo
 N = (tf - t0) / dt;
 t = t0:0.01:tf-0.01;
-t1 = t';
-A = [];
-b = [];
-Aeq = [];
-beq = [];
-Z=fmincon(@costfunc,Z0,A,b,Aeq,beq,lb,ub); 
+t1=t';
 
-%{
 dot_X = @(x,u) ([-Z(1)/Z(2), 0 , -Z(3)*Z(4)/Z(2); 0, 0, 1; -1/Z(7), -Z(4)/Z(7), -Z(6)/Z(7)]*x + [Z(4)/Z(2); 0; 0]*u)
 
 % Arrays para almacenar las trayectorias de las variables de estado,
@@ -40,7 +40,7 @@ for n = 0:N-1
     U(:,n+1) = u(n+1);
     l=n
 end
-%}
+
 figure(1);clf;
 hold on;
 plot(t1,data_Real');
