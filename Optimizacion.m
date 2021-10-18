@@ -1,6 +1,6 @@
 clear all;
 load('DATAREAL.mat')
-Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01];
+Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01]*0;
 lb = zeros(1,7);
 ub = [10,0.01,inf,inf,inf,inf,inf];
 %% Parámetros de la simulación

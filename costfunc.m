@@ -4,7 +4,7 @@ function sum = costfunc(Z)
     t0 = 0;
     tf = 19.15; % tiempo de simulación
     dt = 0.01;
-    N = (tf - t0) / dt
+    N = (tf - t0) / dt;
     t = t0:0.01:tf-0.01;
     
     %% Definicion de las matrices del sistema
@@ -26,11 +26,10 @@ function sum = costfunc(Z)
     
     real = [cor;pos;vel];
     
-    [X,U] = simulate(A, B, C, u, N, dt)
-    sum = 0
+    [X,Y] = simulate(A, B, C, u, N, dt);
+    sum = 0;
     for i = 0:N
-        sum = sum + norm(C*X(i+1) - real(:,i+1));
-        k=i
+        sum = sum + norm(Y(:,(i+1)) - real(:,i+1));
     end
 end
 
