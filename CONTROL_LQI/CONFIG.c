@@ -59,6 +59,16 @@ void CONFIG(void)
         ADCSequenceStepConfigure(ADC0_BASE, 3, 0,ADC_CTL_IE|ADC_CTL_END|ADC_CTL_CH11);
         ADCSequenceEnable(ADC0_BASE,3);
         ADCIntEnable(ADC0_BASE, 3);
+
+
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+        GPIOPinTypeADC(GPIO_PORTE_BASE,GPIO_PIN_5);
+
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
+        while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC1));
+        ADCSequenceStepConfigure(ADC1_BASE, 0, 0,ADC_CTL_IE|ADC_CTL_END|ADC_CTL_CH8);
+        ADCSequenceEnable(ADC1_BASE,0);
+        ADCIntEnable(ADC1_BASE, 0);
         //-------------------------------------------ENCODER------------------------------------------------------------------------------------
         //https://forum.43oh.com/topic/7170-using-harware-qei-on-tiva-launchpad/
         // Enable QEI Peripherals

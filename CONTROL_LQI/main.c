@@ -30,6 +30,7 @@
  */
 uint32_t feedfoward;
 uint32_t COUNT;
+uint32_t corriente;
 //*******************************************************VARIABLE PARA CAMBIO DE GIRO DEL MOTOR***********************************************
 int left;
 int right;
@@ -181,6 +182,11 @@ int main(void)
            ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
            while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
            ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
+
+           ADCIntClear(ADC1_BASE, 0);
+           ADCProcessorTrigger(ADC1_BASE, 0);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
+           while(!ADCIntStatus(ADC1_BASE, 0, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
+           ADCSequenceDataGet(ADC1_BASE, 0, &corriente);// SE LEE ADC
 
            if (fl==0)
            {
