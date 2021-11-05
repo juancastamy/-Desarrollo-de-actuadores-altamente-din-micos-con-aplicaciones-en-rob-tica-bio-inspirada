@@ -1,47 +1,92 @@
 clear all;
 %% CONFIGURACION PARA HABILITAR LA COMUNICACION SERIAL 
-S = serialport('COM8', 115200);
-count = 1;
-s=read(S,1,'uint8');
-tiempo = 5000;
-p = tiempo-1;
-dt = 0.01;
-t0 = 0;
-tf = 48.98;
-k=(tf-t0)/dt;
-t = t0:0.01:48.96;
-t1=t';
-while(1)
-    write(S,1,'char');
-    n = read(S,1,'char')
-    if n == '1'   
-        data(count,:)=read(S,16,'uint8');
-        n=0;        
-        count = count+1
-    end
-    
-    if count==tiempo
-        for i=1:(k-1)
-            data_real(i,:)=data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4);
-            data_real2(i,:)=data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8);
-            data_real3(i,:)=data(i,9)*2^24+data(i,10)*2^16+data(i,11)*2^8+data(i,12);
-            data_real4(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
+
+proceso = 2;
+if proceso == 1
+    S = serialport('COM8', 115200);
+    count = 1;
+    s=read(S,1,'uint8');
+    tiempo = 5000;
+    p = tiempo-1;
+    dt = 0.01;
+    t0 = 0;
+    tf = 48.98;
+    k=(tf-t0)/dt;
+    t = t0:0.01:48.96;
+    t1=t';
+    while(1)
+        write(S,1,'char');
+        n = read(S,1,'char')
+        if n == '1'   
+            data(count,:)=read(S,20,'uint8');
+            n=0;        
+            count = count+1
         end
-        figure(1);clf;
-        hold on;
-        plot(t1,data_real');
 
-        plot(t1,data_real2')
-        
-        legend({'Ref posición','Posición motor'},'Location','northeast','FontSize',15);
-        
-        figure(2);clf;
-        hold on;
-        plot(t1,data_real3');
+        if count==tiempo
+            for i=1:(k-1)
+                pulso(i,:)=data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4);
+                posicion(i,:)=data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8);
+                pulso_velocidad(i,:)=data(i,9)*2^24+data(i,10)*2^16+data(i,11)*2^8+data(i,12);
+                velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
+                corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20))/1000;
+            end
+            figure(1);clf;
+            hold on;
+            plot(t1,pulso');
 
-        plot(t1,data_real4')
-        
-        legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
-        break;
+            plot(t1,posicion')
+
+            legend({'Ref posición','Posición motor'},'Location','northeast','FontSize',15);
+
+            figure(2);clf;
+            hold on;
+            plot(t1,pulso_velocidad');
+
+            plot(t1,velocidad')
+
+            legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
+            break;
+        end
     end
+    save('Valores_impulso_unitario_para_realizar_graficas_correctas2.mat')
+else
+
+    load('Valores_impulso_unitario_para_realizar_graficas_correctas2.mat')
+
+
+    dt = 0.01;
+    t0 = 0;
+    tf = 10;
+    k=(tf-t0)/dt;
+    t = t0:0.01:tf;
+    t1=t';
+    p=1;
+    for n = 1:length(t1)
+        ref(:,n) = (pulso(n))/4095*12;
+        cor(:,n) = corriente(n);
+        vel(:,n) = velocidad(n);
+        if (n == 1)
+            pos(:,n) = posicion(n);
+        else
+            if(posicion(n-1) > posicion(n))
+                p = n-1;
+                pos(:,n) = posicion(n)+pos(p);
+            else
+                pos(:,n) = posicion(n)+pos(p);
+            end
+        end
+    end
+    save('graficas_para_LQI.mat','pos','vel','cor');
+    figure(1);clf;
+    hold on;
+    plot(t1,cor);
+
+    plot(t1,vel);
+    plot(t1,pos);
+
+    legend({'Ref posición','vel','Posición motor'},'Location','northeast','FontSize',15);
+    save('Valores_para_optimizacion2.mat','pos','vel','cor','ref');
+    
 end
+

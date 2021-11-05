@@ -1,49 +1,63 @@
 clear all;
-load('DATAREAL.mat')
-Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01]*0;
-lb = zeros(1,7);
-ub = [10,0.01,inf,inf,inf,inf,inf];
-%% Parámetros de la simulación
-t0 = 0;
-tf = 19.16; % tiempo de simulación
-dt = 0.01;
-N = (tf - t0) / dt;
-t = t0:0.01:tf-0.01;
-t1 = t';
-A = [];
-b = [];
-Aeq = [];
-beq = [];
-Z=fmincon(@costfunc,Z0,A,b,Aeq,beq,lb,ub); 
-
-%{
-dot_X = @(x,u) ([-Z(1)/Z(2), 0 , -Z(3)*Z(4)/Z(2); 0, 0, 1; -1/Z(7), -Z(4)/Z(7), -Z(6)/Z(7)]*x + [Z(4)/Z(2); 0; 0]*u)
-
-% Arrays para almacenar las trayectorias de las variables de estado,
-% entradas y salidas del sistema
-%X = zeros(3,N+1);
-U = zeros(1,N+1);
-% Inicialización de arrays
-%X(:,1) = x0;
-U(:,1) = u0;
-s=[0;0;0];
-%% Solución recursiva del sistema dinámico
-for n = 0:N-1
-    % Método RK4 para la aproximación numérica de la solución
-    k1 = dot_X(x(:,n+1),u(n+1));
-    k2 = dot_X(x(n+1)+(dt/2)*k1, u(n+1));
-    k3 = dot_X(x(n+1)+(dt/2)*k2, u(n+1));
-    k4 = dot_X(x(n+1)+dt*k3, u(n+1));
-    s = x(n+1) + (dt/6)*(k1+2*k2+2*k3+k4);
-    % Se guardan las trayectorias del estado y las entradas
-    X(:,n+1) = s;
-    U(:,n+1) = u(n+1);
-    l=n
+op=1;
+%load('Valores_impulso_unitario_para_realizar_graficas_correctas.mat');
+if op ==1
+    Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01]*0;
+    lb = zeros(1,7); lb(4)=0.065;
+    ub = [10,0.01,inf,0.065,inf,1,1];
+    %% Parámetros de la simulación
+    t0 = 0;
+    tf = 20; % tiempo de simulación
+    dt = 0.01;
+    %N = (tf - t0) / dt;
+    t = t0:0.01:tf-0.01;
+    t1 = t';
+    A = [];
+    b = [];
+    Aeq = [];
+    beq = [];
+    
+    Z=fmincon(@costfunc,Z0,A,b,Aeq,beq,lb,ub,@restricciones)
+else
+    load('Z1.mat');
+    Z1 = Z';
+    
+    load('Z2.mat');
+    Z2 = Z';
+    
+    load('Z3.mat');
+    Z3 = Z';
+    
+    load('Z4.mat');
+    Z4 = Z';
+    
+    load('Z5.mat');
+    Z5 = Z';
+    
+    load('Z6.mat');
+    Z6 = Z';
+    
+    load('Z7.mat');
+    Z7 = Z';
+    
+    load('Z8.mat');
+    Z8 = Z';
+    
+    load('Z9.mat');
+    Z9 = Z';
+    
+    load('Z10.mat');
+    Z10 = Z';
+    
+    load('Z11.mat');
+    Z11 = Z';
+    
+    load('Z12.mat');
+    Z12 = Z';
+    
+    Z = [Z1;Z2;Z3;Z4;Z5;Z6;Z7;Z8;Z9;Z10;Z11;Z12];
+    media = mean(Z);
+    mediana = median(Z);
+    save('valores_para_control_LQR.mat','Z','media','mediana');
 end
-%}
-figure(1);clf;
-hold on;
-plot(t1,data_Real');
 
-plot(t1,data_Real2');
-plot(t1,data_Real3')

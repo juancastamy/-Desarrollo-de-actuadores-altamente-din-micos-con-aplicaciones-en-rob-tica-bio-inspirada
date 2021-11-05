@@ -25,17 +25,19 @@
 #include "CONFIG.h"
 #include "driverlib/qei.h"
 
+
+
 /**
  * main.c
  */
-uint32_t feedfoward;
+
 uint32_t COUNT;
 uint32_t corriente;
 //*******************************************************VARIABLE PARA CAMBIO DE GIRO DEL MOTOR***********************************************
 int left;
 int right;
 //******************************************************VARIABLE PARA ALMACENAR EL MENSAJE POR COMUNICACION UART*******************************
-unsigned char data[16];
+unsigned char data[20];
 
 char n;
 int s;
@@ -47,12 +49,23 @@ uint32_t pwm_word;
 
 float velocidad;
 float posicion;
+float current;
+float volt_medido;
 
 float ref;
-float ref11;
-float ref2;
-float ref22;
 
+float tau;
+float tau_e;
+
+float error_tau;
+float xI;
+float dt;
+float u;
+
+const float k1 = 0.1993;
+const float k2 = -0.0500;
+const float k3 = -0.0808;
+const float k4 = -20.0000;
 
 float pulso;
 
@@ -64,22 +77,11 @@ int serial;
 int BOTON;
 
 struct Filtro pt;
-struct PID_values out;
 
 float giro;
 float rev;
-struct PID_values
-{
-    float difp;//variable para almacenar ek
-    float outp;//variable para almacenar giro
-    float Mep;//variable para almacenar ek_1
-    float MEp;//variable para almacenar Ek_1
-    float difv;//variable para almacenar ek
-    float outv;//variable para almacenar giro
-    float Mev;//variable para almacenar ek_1
-    float MEv;//variable para almacenar Ek_1
-};
 
+float ref22;
 struct Filtro
 {
     float pot;
@@ -94,42 +96,6 @@ struct Filtro filtrado(float senal, float S, float alpha)
     return potenciometro;
 }
 
-
-struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float entrada, float Kp, float Ki, float Kd, int n)
-{
-    struct PID_values resultado;
-    float ek;
-    float ed;
-    float Ek;
-    if (n==0)
-    {
-        ek = entrada - x;
-
-        ed = ek - ek_1;
-        Ek = Ek_1+ek;
-        uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
-
-        resultado.difp = ek;
-        resultado.outp = uk;
-        resultado.Mep = ek;
-        resultado.MEp = Ek;
-    }
-    else
-    {
-        ek = entrada - x;
-        ed = ek - ek_1;
-        Ek = Ek_1+ek;
-        uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
-        resultado.difv = ek;
-        resultado.outv = uk;
-        resultado.Mev = ek;
-        resultado.MEv = Ek;
-    }
-
-    return resultado;
-}
-
-
 void Timer0IntHandler(void){
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     update = 1;
@@ -142,16 +108,14 @@ void UART0IntHandler(void){
     serial=1;
 }
 
-
-
 void direccion(float dir)
 {
-    if(dir >= 1 )
+    if(dir > 0 )
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     }
-    else if (dir <= -1)
+    else if (dir < 0)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
@@ -166,13 +130,14 @@ void direccion(float dir)
 
 int main(void)
 {
-
-    ref = 10;
-    //out.outp=5;
+    ref22=0;
+    ref = 0;
+    xI = 0;
+    dt = 0.01;
+    pulso = 10;
+    ref = 0;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
-    GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
-    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     while(1)
     {
         if(update == 1)
@@ -181,85 +146,65 @@ int main(void)
            ADCIntClear(ADC0_BASE, 3);
            ADCProcessorTrigger(ADC0_BASE, 3);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
            while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
-           ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
+           ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC DE LA REFERENCIA
 
            ADCIntClear(ADC1_BASE, 0);
            ADCProcessorTrigger(ADC1_BASE, 0);//SE ACTIVA EL TRIGUER PARA REALIZAR LECTURA
            while(!ADCIntStatus(ADC1_BASE, 0, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
-           ADCSequenceDataGet(ADC1_BASE, 0, &corriente);// SE LEE ADC
+           ADCSequenceDataGet(ADC1_BASE, 0, &corriente);// SE LEE ADC DE RETROALIMENTACION DE LA CORRIENTE
 
            if (fl==0)
            {
                fl=1;
                pt.pot = COUNT;
            }
+
            pt = filtrado(COUNT, pt.pot, 0.05);
 
-           ref11 = (float)(0.08791*pt.pot);
+           ref = (float)(pt.pot);
 
+           tau = ref * (0.035 / 4095);
 
-           if (ref11 >= 350 && BOTON==0)
-           {
-               ref = 350;
-           }
-           else if (ref11 <=10 && BOTON==0)
-           {
-               ref = 10;
-           }
+           posicion = (float)(QEIPositionGet(QEI0_BASE)*2*3.1416/979.2);//360/979.2);
+           velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
 
-           else
-           {
-               ref = ref11;
-           }
+           volt_medido = (((float)corriente)*3.300)/4095;//esto esta en V
+           current = (((volt_medido)-0.046)/1.7124);//esto esta en A
 
+           tau_e = current*0.065;
 
-           posicion = (float)(QEIPositionGet(QEI0_BASE)*360/979.2);
+           error_tau = tau - tau_e;
 
-           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.5,1.5,0);//PID para control solo de posicion
-           out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,3.5,0.000005,1.75,0);//PID para control en cascada
-           giro=(float)(abs(out.outp)* 11.375);
+           xI = xI + error_tau*dt;
 
-           ref22 = (float)(abs(giro*0.1221));
-           //ref22=(float)(pt.pot *0.1221);
-           velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2);
-           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, 5, 0.5, 0, 1);
-           //******************************************FEEDFOWARD***********************************************************
-           feedfoward = (ref22 - 24.957)*8.1967;
+           u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI));
 
-
-
-          update = 0;
+           update = 0;
         }
-        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
+
+
+        direccion(u);//se selecciona la direccion en la que el motor gira
+
+        pulso = ((float)abs(u)*337.5)+10;
+        /*IF PARA REALIZAR LA TOMA DE DATOS CON UART
+          if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
         {
-            BOTON=1;
+            BOTON = 1;
         }
-
-
-
-        if (giro > 3995)
+        if(BOTON==1)
         {
-            giro = 3995;
+            ref = 4095;
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se apaga pin
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
         }
-        else if (giro < 0)
+        else
         {
-            giro = 0;
-        }
-        rev=(float)((out.outv*8.19) + feedfoward);
-
-        if (rev<10)
-        {
-            rev = 10;
-        }
-        else if (rev>3995)
-        {
-            rev=3995;
-        }
-        pulso = rev;
-
-        direccion(out.difp);//se selecciona la direccion en la que el motor gira
-
+            GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+        }*/
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
+
+
 
 //****************************************************PREPARACION PARA ENVIO DE DATOS POSICION**********************************************
         data[0] = ((uint32_t)ref >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de posicion y se almacenan en la primera
@@ -307,6 +252,18 @@ int main(void)
         data[15]=(uint32_t)velocidad; //se extrae los bits 0-8 de la señal de velocidad del encoder y se almacenan en la diez y seisaba
                                       //posicion del array data
 
+
+        data[16]=((uint32_t)current >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba
+                                                     //posicion del array data
+        data[17]=((uint32_t)current >> 16) & 0xff; //se extrae los bits 16-23 de la señal de velocidad del encoder y se almacenan en la catorceaba
+                                                     //posicion del array data
+        data[18]=((uint32_t)current >> 8) & 0xff; //se extrae los bits 8-15 de la señal de velocidad del encoder y se almacenan en la quinceaba
+                                                    //posicion del array data
+        data[19]=(uint32_t)current; //se extrae los bits 0-8 de la señal de velocidad del encoder y se almacenan en la diez y seisaba
+                                      //posicion del array data
+
+
+
         if(serial==0){
             UARTCharPut(UART0_BASE,'6');
         }
@@ -332,6 +289,10 @@ int main(void)
             UARTCharPut(UART0_BASE,data[13]);
             UARTCharPut(UART0_BASE,data[14]);
             UARTCharPut(UART0_BASE,data[15]);
+            UARTCharPut(UART0_BASE,data[16]);
+            UARTCharPut(UART0_BASE,data[17]);
+            UARTCharPut(UART0_BASE,data[18]);
+            UARTCharPut(UART0_BASE,data[19]);
             n=0;
         }
 

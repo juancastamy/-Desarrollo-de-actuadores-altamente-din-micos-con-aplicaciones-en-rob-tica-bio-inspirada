@@ -2,8 +2,8 @@ function [X,Y] = simulate(A, B, C, u, N, dt)
     %% definicion de las funciones del sistema
     dot_X = @(x,u) (A*x + B*u);
     %se inicializan las matrices de salida
-    X = zeros(3,1916);
-    Y = zeros(3,1916);
+    X = zeros(3,N);
+    Y = zeros(3,N);
     
     x0 = [0;0;0];
     x = x0;
