@@ -68,6 +68,7 @@ const float k3 = -0.0808;
 const float k4 = -20.0000;
 
 float pulso;
+float posible_I;
 
 int update;
 
@@ -138,6 +139,8 @@ int main(void)
     ref = 0;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
+    //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
+      //      GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     while(1)
     {
         if(update == 1)
@@ -163,13 +166,14 @@ int main(void)
 
            ref = (float)(pt.pot);
 
-           tau = ref * (0.035 / 4095);
+           tau = ref * (0.08 / 4095);
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*2*3.1416/979.2);//360/979.2);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
 
-           volt_medido = (((float)corriente)*3.300)/4095;//esto esta en V
-           current = (((volt_medido)-0.046)/1.7124);//esto esta en A
+           volt_medido = (((float)corriente)*3300)/4095;//esto esta en V
+           current = (((volt_medido/1000)-0.046)/1.7124);//esto esta en A
+           posible_I = (volt_medido/1000)/1.4;
 
            tau_e = current*0.065;
 
