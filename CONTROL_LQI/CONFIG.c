@@ -108,7 +108,7 @@ void CONFIG(void)
         GPIOPinTypeGPIOOutput(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7,0x00);
     //-----------------------------------------------PWM------------------------------------------------------------------------------------
-        uint32_t PWM_FREC=20000;
+        uint32_t PWM_FREC=40000;
         uint32_t pwm_word;
         pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
         SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
@@ -135,7 +135,7 @@ void CONFIG(void)
     //----------------------------------------INICIALIZACION DEL TIMER 0------------------------------------------
         TimerConfigure(TIMER0_BASE,TIMER_CFG_PERIODIC);
     //----------------------------------------CONFIGURACION DEL TIEMPO DEL TIMER 0-------------------------------
-        TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet()/100) -1);
+        TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet()/1000) -1);
     //-----------------------------------------SE ACTIVAN LAS INTERRUPCIONES DEL TIMER0------------------------------------
 
         IntEnable(INT_TIMER0A);

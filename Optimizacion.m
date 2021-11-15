@@ -3,8 +3,8 @@ op=1;
 %load('Valores_impulso_unitario_para_realizar_graficas_correctas.mat');
 if op ==1
     Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01]*0;
-    lb = zeros(1,7); lb(4)=0.065;
-    ub = [10,0.01,inf,0.065,inf,1,1];
+    lb = zeros(1,7); %lb(4)=0.000065;
+    ub = [inf,inf,inf,inf,inf,inf,inf];%[10,0.01,inf,0.000065,inf,inf,inf];
     %% Parámetros de la simulación
     t0 = 0;
     tf = 20; % tiempo de simulación
@@ -17,7 +17,7 @@ if op ==1
     Aeq = [];
     beq = [];
     
-    Z=fmincon(@costfunc,Z0,A,b,Aeq,beq,lb,ub,@restricciones)
+    Z=fmincon(@costfunc,Z0,A,b,Aeq,beq,lb,ub);%,@restricciones)
 else
     load('Z1.mat');
     Z1 = Z';

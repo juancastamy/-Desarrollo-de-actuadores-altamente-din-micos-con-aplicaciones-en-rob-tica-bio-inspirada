@@ -42,13 +42,17 @@ unsigned char data[20];
 char n;
 int s;
 
-uint32_t PWM_FREC=20000;
+uint32_t PWM_FREC=40000;
 uint32_t pwm_word;
 
-
+float delta_pos=0;
+float pos_tot=0;
+float pos_pas=0;
+float j=0;
 
 float velocidad;
 float posicion;
+float sentido;
 float current;
 float volt_medido;
 
@@ -62,13 +66,20 @@ float xI;
 float dt;
 float u;
 
-const float k1 = 0.1993;
-const float k2 = -0.0500;
-const float k3 = -0.0808;
-const float k4 = -20.0000;
+//const float k1 = 0.1993;
+//const float k2 = -0.0500;
+//const float k3 = -0.0808;
+//const float k4 = -20.0000;
+
+const float k1 = 1;
+const float k2 = 1;
+const float k3 = -1;
+const float k4 = 5;
 
 float pulso;
 float posible_I;
+
+float posref = 0.00;
 
 int update;
 
@@ -81,6 +92,12 @@ struct Filtro pt;
 
 float giro;
 float rev;
+
+float current_filt;
+float lambda = 0.6;
+float error_pos = 0;
+
+float volts = 0;
 
 float ref22;
 struct Filtro
@@ -134,13 +151,13 @@ int main(void)
     ref22=0;
     ref = 0;
     xI = 0;
-    dt = 0.01;
+    dt = 0.001;
     pulso = 10;
     ref = 0;
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
     //GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
-      //      GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+    //GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     while(1)
     {
         if(update == 1)
@@ -164,40 +181,95 @@ int main(void)
 
            pt = filtrado(COUNT, pt.pot, 0.05);
 
-           ref = (float)(pt.pot);
+           //ref = (float)(pt.pot);
 
            tau = ref * (0.08 / 4095);
 
            posicion = (float)(QEIPositionGet(QEI0_BASE)*2*3.1416/979.2);//360/979.2);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
+           sentido = QEIDirectionGet(QEI0_BASE);
 
            volt_medido = (((float)corriente)*3300)/4095;//esto esta en V
-           current = (((volt_medido/1000)-0.046)/1.7124);//esto esta en A
-           posible_I = (volt_medido/1000)/1.4;
+           current = (((float)corriente)/4.5232)*(3.3/4095)*(1000/0.144);//esto esta en mA
 
-           tau_e = current*0.065;
+           current_filt = lambda * current_filt + (1-lambda) * current;
 
-           error_tau = tau - tau_e;
+           tau_e = current_filt*0.065;
 
-           xI = xI + error_tau*dt;
+           //error_tau = tau - tau_e;
 
-           u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI));
+           //xI = xI + error_tau*dt;
+           //---------------------------------------obtencion de la posicion en valores positivos y negativos--------------------------------------
+           delta_pos = posicion - pos_pas;
+           pos_pas = posicion;
+           if (sentido == 1)
+           {
+               tau_e = abs(tau_e);
+               if (delta_pos < -5)
+               {
+                   j=1;
+               }
+               if (j==0)
+               {
+                   pos_tot = pos_tot + delta_pos;
+
+               }
+               if (j==1)
+               {
+                   pos_tot = pos_tot + posicion;
+                   j=0;
+               }
+           }
+           if(sentido == -1)
+           {
+               tau_e = -abs(tau_e);
+
+               if (delta_pos > 5)
+               {
+                   j=1;
+               }
+               if (j==0)
+               {
+                   pos_tot = pos_tot + delta_pos;
+               }
+               if (j==1)
+               {
+                   pos_tot = pos_tot - (2*3.1416-posicion);
+                   j=0;
+               }
+           }
+
+
+
+
+           error_pos = posref - pos_tot;
+           xI = xI + error_pos*dt;
+
+           //u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI));
+
+           //u = -((k1*tau_e) + (k2*pos_tot) + (k3*velocidad) + (k4*xI));
+
+           u = -0.2*50*(pos_tot - posref);
 
            update = 0;
         }
 
 
-        direccion(u);//se selecciona la direccion en la que el motor gira
 
-        pulso = ((float)abs(u)*337.5)+10;
-        /*IF PARA REALIZAR LA TOMA DE DATOS CON UART
-          if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
+        //direccion(u);//se selecciona la direccion en la que el motor gira
+
+        //pulso = ((float)abs(u)*4095)/12;
+
+        direccion(u);
+        pulso = 30 + ((float)abs(u)*4095)/12;
+        //IF PARA REALIZAR LA TOMA DE DATOS CON UART
+        /*  if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
         {
             BOTON = 1;
         }
         if(BOTON==1)
         {
-            ref = 4095;
+            ref = 25;
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se apaga pin
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
         }
@@ -205,6 +277,14 @@ int main(void)
         {
             GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
             GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+        }*/
+        /*if(pt.pot < 30)
+        {
+            ref = 30;
+        }
+        else if (pt.pot > 4055)
+        {
+            ref = 4055;
         }*/
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
 
@@ -257,13 +337,13 @@ int main(void)
                                       //posicion del array data
 
 
-        data[16]=((uint32_t)current >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba
+        data[16]=((uint32_t)current_filt >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba
                                                      //posicion del array data
-        data[17]=((uint32_t)current >> 16) & 0xff; //se extrae los bits 16-23 de la señal de velocidad del encoder y se almacenan en la catorceaba
+        data[17]=((uint32_t)current_filt >> 16) & 0xff; //se extrae los bits 16-23 de la señal de velocidad del encoder y se almacenan en la catorceaba
                                                      //posicion del array data
-        data[18]=((uint32_t)current >> 8) & 0xff; //se extrae los bits 8-15 de la señal de velocidad del encoder y se almacenan en la quinceaba
+        data[18]=((uint32_t)current_filt >> 8) & 0xff; //se extrae los bits 8-15 de la señal de velocidad del encoder y se almacenan en la quinceaba
                                                     //posicion del array data
-        data[19]=(uint32_t)current; //se extrae los bits 0-8 de la señal de velocidad del encoder y se almacenan en la diez y seisaba
+        data[19]=(uint32_t)current_filt; //se extrae los bits 0-8 de la señal de velocidad del encoder y se almacenan en la diez y seisaba
                                       //posicion del array data
 
 

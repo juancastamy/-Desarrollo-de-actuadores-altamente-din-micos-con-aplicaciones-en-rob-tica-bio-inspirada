@@ -29,7 +29,7 @@ if proceso == 1
                 posicion(i,:)=data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8);
                 pulso_velocidad(i,:)=data(i,9)*2^24+data(i,10)*2^16+data(i,11)*2^8+data(i,12);
                 velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
-                corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20))/1000;
+                corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20));
             end
             figure(1);clf;
             hold on;
@@ -41,18 +41,18 @@ if proceso == 1
 
             figure(2);clf;
             hold on;
-            plot(t1,pulso_velocidad');
+            plot(t1,velocidad');
 
-            plot(t1,velocidad')
+            plot(t1,corriente')
 
             legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
             break;
         end
     end
-    save('Valores_impulso_unitario_para_realizar_graficas_correctas2.mat')
+    save('Valores_impulso_con_carga.mat')
 else
 
-    load('Valores_impulso_unitario_para_realizar_graficas_correctas2.mat')
+    load('Valores_impulso_con_carga.mat')
 
 
     dt = 0.01;

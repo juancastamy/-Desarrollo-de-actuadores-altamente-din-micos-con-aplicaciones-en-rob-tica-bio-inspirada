@@ -1,7 +1,7 @@
 function sum = costfunc(Z)
     datos = 1;
     if datos == 1
-        load('Valores_para_optimizacion2.mat','pos','vel','cor','ref');
+        load('optimizacion.mat','pos','vel','cor','ref');
         %% Parámetros de la simulación
         t0 = 0;
         tf = 10; % tiempo de simulación

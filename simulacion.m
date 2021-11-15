@@ -1,6 +1,6 @@
 %% Parámetros del sistema
 %load('valores_para_control_LQR2.mat');
-load('Nuevo_Z3.mat','Z');
+load('opt_carga2.mat','Z');
 %% Matrices continuas del sistema LTI
 A = [ -Z(1)/Z(2),         0, -Z(3)*Z(4)/Z(2);
                0,         0,               1;
@@ -15,8 +15,8 @@ D = 0;
 
 %% Parámetros de la simulación
 t0 = 0; % tiempo inicial
-tf = 20; % tiempo de simulación
-dt = 0.01; % período de muestreo
+tf = 10; % tiempo de simulación
+dt = 0.001; % período de muestreo
 K = (tf - t0) / dt; % número de iteraciones
 
 %% Inicialización y condiciones iniciales
@@ -50,7 +50,7 @@ R = 0.25;
 Klqr = lqr(A, B, Q, R);
 
 % Diseño LQI
-Cr = [1, 0, 0];
+Cr = [0, 1, 0];
 Abar = [A, zeros(3,1); -Cr, 0];
 Bbar = [B; 0];
 ver = rank(ctrb(Abar,Bbar));
@@ -60,9 +60,10 @@ else
     fprintf ('El sistema no es completamente controlable. \n');
 end
     
-Qbar = eye(4); Qbar(2,2) = 0.5; Qbar(4,4) = 100;
-Rbar = 0.25;
-Klqi = lqr(Abar, Bbar, Qbar, Rbar);
+Qbar = eye(4); Qbar(4,4) = 200; Qbar(3,3) = 0.5; %Qbar(4,4) = 100;
+Rbar = 1;
+%Klqi = lqr(Abar, Bbar, Qbar, Rbar);
+Klqi = [300 200 -1 50];
 % Klqi = place(Abar, Bbar, [-0.1,-0.2,-0.3,-0.4]);
 xI = 0;
 tau_d = 0.73;
@@ -82,13 +83,15 @@ for k = 1:K
     % Escalón unitario
     %r = tau_d*sin(2*pi*0.1*k*dt); % referencia de torque
     %r = exp(-0.2*dt*k)*tau_d*sin(2*pi*0.1*k*dt); 
-    r = tau_d;
+    r = pi/2;%tau_d;
     
-    xI = xI + (r - x(1))*dt;
+    xI = xI + (r - x(2))*dt;
 %   u = -2*Klqi*[x; 6*xI];
-    u = -Klqi*[x; 20*xI];
+   u = -Klqi*[x; xI];
 %     u = -Klqr*x;
 %     u = 1;
+    %u = -1.83037700777899;
+    
     
     % Se propaga el sistema LTI discreto para aproximar la solución del
     % sistema continuo
