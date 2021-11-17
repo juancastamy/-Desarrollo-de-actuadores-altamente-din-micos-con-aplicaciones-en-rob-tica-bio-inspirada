@@ -65,16 +65,25 @@ float error_tau;
 float xI;
 float dt;
 float u;
+/*
+const float k1 = 0.1993;
+const float k2 = -0.0500;
+const float k3 = -0.0808;
+const float k4 = -20.0000;
+*/
 
-//const float k1 = 0.1993;
-//const float k2 = -0.0500;
-//const float k3 = -0.0808;
-//const float k4 = -20.0000;
-
+/*
 const float k1 = 1;
 const float k2 = 1;
 const float k3 = -1;
 const float k4 = 5;
+*/
+
+const float k1 = 1;
+const float k2 = -0.05;
+const float k3 = -0.08;
+const float k4 = 5;
+float Ek = 0;
 
 float pulso;
 float posible_I;
@@ -132,11 +141,13 @@ void direccion(float dir)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+        tau_e = abs(tau_e);
     }
     else if (dir < 0)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
+        tau_e = -abs(tau_e);
     }
     else
     {
@@ -204,7 +215,7 @@ int main(void)
            pos_pas = posicion;
            if (sentido == 1)
            {
-               tau_e = abs(tau_e);
+
                if (delta_pos < -5)
                {
                    j=1;
@@ -222,7 +233,7 @@ int main(void)
            }
            if(sentido == -1)
            {
-               tau_e = -abs(tau_e);
+
 
                if (delta_pos > 5)
                {
@@ -247,9 +258,12 @@ int main(void)
 
            //u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI));
 
-           //u = -((k1*tau_e) + (k2*pos_tot) + (k3*velocidad) + (k4*xI));
+           u = -(2*((k1*tau_e) + (k2*pos_tot) + (k3*velocidad)) + (k4*xI));
 
-           u = -0.2*50*(pos_tot - posref);
+
+           //u = -0.2*50*(pos_tot - posref) + 3*((pos_tot - posref)-Ek);
+
+          // Ek=(pos_tot - posref);
 
            update = 0;
         }
