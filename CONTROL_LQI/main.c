@@ -57,6 +57,7 @@ float current;
 float volt_medido;
 
 float ref;
+float pos;
 
 float tau;
 float tau_e;
@@ -78,12 +79,21 @@ const float k2 = 1;
 const float k3 = -1;
 const float k4 = 5;
 */
+/*
+const float k1 = 2.5;
+const float k2 = 1;
+const float k3 = -1;
+const float k4 = 8;
+*/
+float G=2;
+
 
 const float k1 = 1;
-const float k2 = -0.05;
+const float k2 = 0.05;
 const float k3 = -0.08;
 const float k4 = 5;
-float Ek = 0;
+
+//float Ek = 0;
 
 float pulso;
 float posible_I;
@@ -158,7 +168,9 @@ void direccion(float dir)
 
 
 int main(void)
+
 {
+    //1.3
     ref22=0;
     ref = 0;
     xI = 0;
@@ -253,15 +265,15 @@ int main(void)
 
 
 
-           error_pos = posref - pos_tot;
+           error_pos = -posref + pos_tot;
            xI = xI + error_pos*dt;
 
-           //u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI));
+           //u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI)); no
 
-           u = -(2*((k1*tau_e) + (k2*pos_tot) + (k3*velocidad)) + (k4*xI));
+          u = -(((G*k1*tau_e)/1000 + (G*k2*pos_tot) + (G*k3*velocidad)) + (G*k4*xI));//si
 
 
-           //u = -0.2*50*(pos_tot - posref) + 3*((pos_tot - posref)-Ek);
+          //u = -0.2*50*(pos_tot - posref);
 
           // Ek=(pos_tot - posref);
 
@@ -302,6 +314,8 @@ int main(void)
         }*/
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
 
+        ref = posref * 180/3.1416;
+        pos = pos_tot * 180/3.1416;
 
 
 //****************************************************PREPARACION PARA ENVIO DE DATOS POSICION**********************************************
@@ -317,16 +331,16 @@ int main(void)
         data[3] = (uint32_t)ref & 0xff; //se extrae los bits 0-7 de la señal de referencia de posicion y se almacenan en la cuarta
                                         //posicion del array data
 
-        data[4] = ((uint32_t)posicion >> 24) & 0xff; //se extrae los bits 24-31 de la señal de posicion del encoder y se almacenan en la quinta
+        data[4] = ((uint32_t)pos >> 24) & 0xff; //se extrae los bits 24-31 de la señal de posicion del encoder y se almacenan en la quinta
                                                      //posicion del array data
 
-        data[5] = ((uint32_t)posicion >> 16) & 0xff; //se extrae los bits 16-23 de la señal de posicion del encoder y se almacenan en la sexta
+        data[5] = ((uint32_t)pos >> 16) & 0xff; //se extrae los bits 16-23 de la señal de posicion del encoder y se almacenan en la sexta
                                                      //posicion del array data
 
-        data[6] = ((uint32_t)posicion >> 8) & 0xff; //se extrae los bits 8-15 de la señal de posicion del encoder y se almacenan en la septima
+        data[6] = ((uint32_t)pos >> 8) & 0xff; //se extrae los bits 8-15 de la señal de posicion del encoder y se almacenan en la septima
                                                     //posicion del array data
 
-        data[7] = (uint32_t)posicion; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
+        data[7] = (uint32_t)pos; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
                                       //posicion del array data
 //*******************************************************ENVIO DATOS VELOCIDAD*********************************************************
         data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena

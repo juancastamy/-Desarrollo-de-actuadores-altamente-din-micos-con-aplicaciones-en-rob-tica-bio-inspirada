@@ -63,7 +63,7 @@ end
 Qbar = eye(4); Qbar(4,4) = 200; Qbar(3,3) = 0.5; %Qbar(4,4) = 100;
 Rbar = 1;
 %Klqi = lqr(Abar, Bbar, Qbar, Rbar);
-Klqi = [300 200 -1 50];
+Klqi = [300 200 -1 500];
 % Klqi = place(Abar, Bbar, [-0.1,-0.2,-0.3,-0.4]);
 xI = 0;
 tau_d = 0.73;
