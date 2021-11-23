@@ -1,6 +1,6 @@
 clear all;
 %% CONFIGURACION PARA HABILITAR LA COMUNICACION SERIAL 
-S = serialport('COM7', 115200);
+S = serialport('COM8', 115200);
 count = 1;
 s=read(S,1,'uint8');
 tiempo = 5000;

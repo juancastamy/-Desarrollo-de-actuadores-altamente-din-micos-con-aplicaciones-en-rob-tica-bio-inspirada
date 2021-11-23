@@ -90,7 +90,8 @@ void CONFIG(void)
         QEIEnable(QEI0_BASE);
 
         //Set position to a middle value so we can see if things are working
-        QEIPositionSet(QEI0_BASE, 28);
+        //QEIPositionSet(QEI0_BASE, 28);
+        QEIPositionSet(QEI0_BASE, 0);
     //--------------------------------------------PINES DIGITALES PARA EL DRIVER----------------------------------------------------------
         SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
         while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
