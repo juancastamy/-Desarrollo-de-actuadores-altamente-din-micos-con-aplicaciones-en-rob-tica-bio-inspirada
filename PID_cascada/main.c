@@ -28,50 +28,52 @@
 /**
  * main.c
  */
-uint32_t feedfoward;
-uint32_t COUNT;
+uint32_t feedfoward; //Termin ode feedfoward para mejorar el controlador
+uint32_t COUNT; //datos del ADC
 //*******************************************************VARIABLE PARA CAMBIO DE GIRO DEL MOTOR***********************************************
 int left;
 int right;
 //******************************************************VARIABLE PARA ALMACENAR EL MENSAJE POR COMUNICACION UART*******************************
-unsigned char data[16];
+unsigned char data[16]; //guardado de la data para realizar comunicacion UART
 
 char n;
 int s;
 
-uint32_t PWM_FREC=20000;
+uint32_t PWM_FREC=20000; //Frecuencia de la señal del PWM
 uint32_t pwm_word;
 
 
 
-float velocidad;
-float posicion;
-float sentido;
+float velocidad;//variable para guardar la velocidad del motor
+float posicion;//variable para guardar la posicion del motor
+float sentido;//variable para guardar el centido en el que gira el motor
 
+//*************LAS SIGUENTES VARIABLES SIRVEN PARA CALCULAR LA POSICION DEL MOTOR SIN QUE SE RECETEE EL ANGULO Y QUE PUEDA SER NEGATIVO********
 float posref;
 float delta_pos;
 float pos_pas;
 float pos_tot;
+//***********************************************************************************************************************************************
 
-float ref;
-float salida_posicion;
-float ref2;
-float ref_grados;
+float ref;//referencia del PID de posicion
+float salida_posicion;//Salida de la posicion del encoder en grados
+float ref2;//referencia del PID de velocidad
+float ref_grados;//referencia de posicion en grados
 
-float pulso;
+float pulso;//valor de 0 a 4095 para enviar al PWM
 
-int update;
+int update;//bandera de la interrupcion del timer
 
 int fl;
 int serial;
 int j;
-int BOTON;
 
 
 
 
-float giro;
-float rev;
+float giro;//variable para la salida del PID de posicion en valores para el PWM
+
+//***************************STRUCT PARA REALIZAR CONTROLADORES PID**************************************
 struct PID_values out;
 struct PID_values
 {
@@ -85,8 +87,18 @@ struct PID_values
     float MEv;//variable para almacenar Ek_1
 };
 
-struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float entrada, float Kp, float Ki, float Kd, int n)
+struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float entrada, float Kp, float Ki, float Kd, int n)//Funcion del PID
 {
+    //uk -> salida del controlador
+    //ek_1 -> valor pasado del error
+    //Ek_1 -> valor pasado del error integrador
+    //x -> valor retornado por el sensor
+    //entrada -> valor de referencia
+    //Kp -> contante P
+    //Ki -> contante I
+    //Kd -> contante D
+    //n -> seleccion del guardado de los valores para control de posicion o el de velocidad
+
     struct PID_values resultado;
     float ek;
     float ed;
@@ -96,15 +108,15 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     Ek = Ek_1+ek;
     uk = (Kp*ek) + (Ki*Ek) + (Kd*ed);
     if (n==0)
-        //out = control_pid (out.outv, out.Mev, out.MEv, velocidad, posref, 1, 0.01, 0, 1);
     {
-        if (Ek >= 200)
+        //se trunco el valor del error intregrador para que no provocase que el controlador se perdiera
+        if (Ek >= 10)
         {
-            Ek = 200;
+            Ek = 10;
         }
-        else if (Ek <= -200)
+        else if (Ek <= -10)
         {
-            Ek = -200;
+            Ek = -10;
         }
 
         resultado.difp = ek;
@@ -124,15 +136,18 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
 }
 
 
+//*************************************STRUCTO PARA EL FILTRADO DEL POTENCIOMETRO*********************************
 struct Filtro pt;
 struct Filtro
 {
     float pot;
-
 };
 
 struct Filtro filtrado(float senal, float S, float alpha)
 {
+    //senal -> valor del ADC actual
+    //S -> salida pasada del filtro
+    //alpha -> valor que controla que tan intenso es el filtrado
     struct Filtro potenciometro;
     s = (alpha*senal)+((1-alpha)*S);
     potenciometro.pot = s;
@@ -141,13 +156,14 @@ struct Filtro filtrado(float senal, float S, float alpha)
 
 
 
-
+//**********************************INTERRIPCION DEL TIMER0 PARA LA TOMA DE MUESTRAS******************************
 void Timer0IntHandler(void){
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
     update = 1;
 
 }
 
+//******************************INTERRUPCION PARA REALIZAR LA COMUNICACION UART*********************************
 void UART0IntHandler(void){
     UARTIntClear(UART0_BASE,UARTIntStatus(UART0_BASE, true)); //se limpia la bandera de la interrupcion
     n = UARTCharGet(UART0_BASE);//se lee lo que entra al UART0
@@ -155,19 +171,23 @@ void UART0IntHandler(void){
 }
 
 
-
+//*****************************FUNCION PARA DECIDIR EL CENTIDO DE GIRO DEL MOTOR*********************************
 void direccion(float dir)
 {
+    //dir -> variable que decide el centido del giro
+    //giro encontra de las manecillas del reloj
     if(dir > 0 )
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     }
+    //giro a favor de las manecillas del reloj
     else if (dir < 0)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
     }
+    //el motor se detiene
     else
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
@@ -180,11 +200,9 @@ int main(void)
 {
 
 
-    CONFIG();
-    pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
-    GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
-    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
-    out.MEv=0;
+    CONFIG();//se cargan todas las configuraciones
+
+    pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;//factor por el que se tiene que multiplicar el valor que se envia al PWM
     while(1)
     {
         if(update == 1)
@@ -246,28 +264,25 @@ int main(void)
               }
           }
 
-           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,10,0.002,0.001,0);//PID para control solo de posicion
-          // out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, ref,5,0.002,0.0001,0);//PID para control en cascada
+           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.000,0.001,0);
+           out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, ref,10,0.002,0.0001,0);//PID para control solo de posicion
+           //out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, ref,5,0.000001,0.0001,0);//PID para control en cascada
            giro=(float)(abs(out.outp)*4095)/(2*3.1416);
 
-           ref2 = (float)(giro*52.35988/4095);
+           ref2 = (float)(pt.pot*52.35988/4095);//(float)(giro*52.35988/4095);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
-           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 2, 0.0, 0, 1);
+           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 1.5, 0.002, 0.00001, 1);//PID para control solo de posicion
+           //out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 1.25, 0.0, 0.00001, 1);//1.5//PID para control en cascada
            //******************************************FEEDFOWARD***********************************************************
-          feedfoward = 0;//(ref2 - 2.6135)*78.125;
-
-
-
+          feedfoward = (ref2 - 2.6135)*78.125;
           update = 0;
         }
-        if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
-        {
-            BOTON=1;
-        }
 
+        //pulso = giro + 30;
         pulso = (float)(30 + (abs(out.outv)*4095)/52.35998);
+       // pulso = (float)(30 + (abs(out.outv)*4095)/52.35998)+feedfoward;
 
-        direccion(out.outp);//se selecciona la direccion en la que el motor gira
+        direccion(2);//se selecciona la direccion en la que el motor gira
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
         salida_posicion=(180/3.1416)*pos_tot;
         ref_grados=(180/3.1416)*ref;
@@ -321,7 +336,7 @@ int main(void)
             UARTCharPut(UART0_BASE,'6');
         }
 //*******************************SI SE RECIVE EL VALOR DE n=1 DEL UART SE INICIA A ENVIAR TODOS LOS DATOS EN ORDEN*******************************************
-        if (n ==1)
+        if (n == 1)
         {
             UARTCharPut(UART0_BASE,'1');
 
