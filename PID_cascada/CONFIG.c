@@ -125,7 +125,7 @@ void CONFIG(void)
     //----------------------------------------INICIALIZACION DEL TIMER 0------------------------------------------
         TimerConfigure(TIMER0_BASE,TIMER_CFG_PERIODIC);
     //----------------------------------------CONFIGURACION DEL TIEMPO DEL TIMER 0-------------------------------
-        TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet()/100) -1);
+        TimerLoadSet(TIMER0_BASE, TIMER_A, (SysCtlClockGet()/1000) -1);
     //-----------------------------------------SE ACTIVAN LAS INTERRUPCIONES DEL TIMER0------------------------------------
 
         IntEnable(INT_TIMER0A);

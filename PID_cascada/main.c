@@ -54,10 +54,9 @@ float pos_pas;
 float pos_tot;
 
 float ref;
-float ref11;
+float salida_posicion;
 float ref2;
-float ref22;
-
+float ref_grados;
 
 float pulso;
 
@@ -68,11 +67,12 @@ int serial;
 int j;
 int BOTON;
 
-struct Filtro pt;
-struct PID_values out;
+
+
 
 float giro;
 float rev;
+struct PID_values out;
 struct PID_values
 {
     float difp;//variable para almacenar ek
@@ -84,21 +84,6 @@ struct PID_values
     float Mev;//variable para almacenar ek_1
     float MEv;//variable para almacenar Ek_1
 };
-
-struct Filtro
-{
-    float pot;
-
-};
-
-struct Filtro filtrado(float senal, float S, float alpha)
-{
-    struct Filtro potenciometro;
-    s = (alpha*senal)+((1-alpha)*S);
-    potenciometro.pot = s;
-    return potenciometro;
-}
-
 
 struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float entrada, float Kp, float Ki, float Kd, int n)
 {
@@ -113,6 +98,15 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     if (n==0)
         //out = control_pid (out.outv, out.Mev, out.MEv, velocidad, posref, 1, 0.01, 0, 1);
     {
+        if (Ek >= 200)
+        {
+            Ek = 200;
+        }
+        else if (Ek <= -200)
+        {
+            Ek = -200;
+        }
+
         resultado.difp = ek;
         resultado.outp = uk;
         resultado.Mep = ek;
@@ -128,6 +122,24 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
 
     return resultado;
 }
+
+
+struct Filtro pt;
+struct Filtro
+{
+    float pot;
+
+};
+
+struct Filtro filtrado(float senal, float S, float alpha)
+{
+    struct Filtro potenciometro;
+    s = (alpha*senal)+((1-alpha)*S);
+    potenciometro.pot = s;
+    return potenciometro;
+}
+
+
 
 
 void Timer0IntHandler(void){
@@ -146,12 +158,12 @@ void UART0IntHandler(void){
 
 void direccion(float dir)
 {
-    if(dir >= 1 )
+    if(dir > 0 )
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
     }
-    else if (dir <= -1)
+    else if (dir < 0)
     {
         GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,0x00);//se apaga pin
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,GPIO_PIN_6);//se enciende pin
@@ -167,12 +179,12 @@ void direccion(float dir)
 int main(void)
 {
 
-    ref = 10;
-    //out.outp=5;
+
     CONFIG();
     pwm_word = ((SysCtlClockGet()/1)/PWM_FREC)-1;
     GPIOPinWrite(GPIO_PORTA_BASE,GPIO_PIN_5,GPIO_PIN_5);//se enciende pin//el encoder sumara
     GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_6,0x00);//se apaga pin
+    out.MEv=0;
     while(1)
     {
         if(update == 1)
@@ -189,23 +201,7 @@ int main(void)
                pt.pot = COUNT;
            }
            pt = filtrado(COUNT, pt.pot, 0.05);
-
-           ref11 = (float)(0.08791*pt.pot);
-
-
-           if (ref11 >= 350 && BOTON==0)
-           {
-               ref = 350;
-           }
-           else if (ref11 <=10 && BOTON==0)
-           {
-               ref = 10;
-           }
-
-           else
-           {
-               ref = ref11;
-           }
+           ref = (float)(pt.pot*2*3.1416/4095);
 
            sentido = QEIDirectionGet(QEI0_BASE);
            posicion = (float)(QEIPositionGet(QEI0_BASE)*2*3.1416/979.2);
@@ -250,15 +246,15 @@ int main(void)
               }
           }
 
-           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,5,0.5,1.5,0);//PID para control solo de posicion
-           out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, posref,5,0.01,0.001,0);//PID para control en cascada 3.5,0.000005,1.75,0
-           giro=(float)(abs(out.outp)*4095)/12;
+           //out = control_pid (out.outp, out.Mep, out.MEp, posicion, ref,10,0.002,0.001,0);//PID para control solo de posicion
+          // out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, ref,5,0.002,0.0001,0);//PID para control en cascada
+           giro=(float)(abs(out.outp)*4095)/(2*3.1416);
 
-           ref22 = (float)(giro*52.35988/4095);
+           ref2 = (float)(giro*52.35988/4095);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
-           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref22, 1.2, 0.005, 0.00001, 1);
+           out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 2, 0.0, 0, 1);
            //******************************************FEEDFOWARD***********************************************************
-          // feedfoward = (ref22 - 24.957)*8.1967;
+          feedfoward = 0;//(ref2 - 2.6135)*78.125;
 
 
 
@@ -269,67 +265,47 @@ int main(void)
             BOTON=1;
         }
 
-
-
-       /* if (giro > 3995)
-        {
-            giro = 3995;
-        }
-        else if (giro < 0)
-        {
-            giro = 0;
-        }
-        rev=(float)((out.outv*8.19) + feedfoward);
-
-        if (rev<10)
-        {
-            rev = 10;
-        }
-        else if (rev>3995)
-        {
-            rev=3995;
-        }*/
-        pulso = 30 + (abs(out.outv)*4095)/12;
+        pulso = (float)(30 + (abs(out.outv)*4095)/52.35998);
 
         direccion(out.outp);//se selecciona la direccion en la que el motor gira
-
         PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, pulso*pwm_word/4095);//se envia la salida del controlador convertido a señal PWM al pwm.
-
+        salida_posicion=(180/3.1416)*pos_tot;
+        ref_grados=(180/3.1416)*ref;
 //****************************************************PREPARACION PARA ENVIO DE DATOS POSICION**********************************************
-        data[0] = ((uint32_t)posref >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de posicion y se almacenan en la primera
+        data[0] = ((uint32_t)ref_grados >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de posicion y se almacenan en la primera
                                                  //posicion del array data
 
-        data[1] = ((uint32_t)posref >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de posicion y se almacenan en la segunda
+        data[1] = ((uint32_t)ref_grados >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de posicion y se almacenan en la segunda
                                                  //posicion del array data
 
-        data[2] = ((uint32_t)posref >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de posicion y se almacenan en la tercera
+        data[2] = ((uint32_t)ref_grados >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de posicion y se almacenan en la tercera
                                                  //posicion del array data
 
-        data[3] = (uint32_t)posref & 0xff; //se extrae los bits 0-7 de la señal de referencia de posicion y se almacenan en la cuarta
+        data[3] = (uint32_t)ref_grados & 0xff; //se extrae los bits 0-7 de la señal de referencia de posicion y se almacenan en la cuarta
                                         //posicion del array data
 
-        data[4] = ((uint32_t)pos_tot >> 24) & 0xff; //se extrae los bits 24-31 de la señal de posicion del encoder y se almacenan en la quinta
+        data[4] = ((uint32_t)salida_posicion >> 24) & 0xff; //se extrae los bits 24-31 de la señal de posicion del encoder y se almacenan en la quinta
                                                      //posicion del array data
 
-        data[5] = ((uint32_t)pos_tot >> 16) & 0xff; //se extrae los bits 16-23 de la señal de posicion del encoder y se almacenan en la sexta
+        data[5] = ((uint32_t)salida_posicion >> 16) & 0xff; //se extrae los bits 16-23 de la señal de posicion del encoder y se almacenan en la sexta
                                                      //posicion del array data
 
-        data[6] = ((uint32_t)pos_tot >> 8) & 0xff; //se extrae los bits 8-15 de la señal de posicion del encoder y se almacenan en la septima
+        data[6] = ((uint32_t)salida_posicion >> 8) & 0xff; //se extrae los bits 8-15 de la señal de posicion del encoder y se almacenan en la septima
                                                     //posicion del array data
 
-        data[7] = (uint32_t)pos_tot; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
+        data[7] = (uint32_t)salida_posicion; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
                                       //posicion del array data
 //*******************************************************ENVIO DATOS VELOCIDAD*********************************************************
-        data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena
+        data[8] = ((uint32_t)ref2 >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena
                                                    //posicion del array data
 
-        data[9] = ((uint32_t)ref22 >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de velocidad y se almacenan en la decima
+        data[9] = ((uint32_t)ref2 >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de velocidad y se almacenan en la decima
                                                    //posicion del array data
 
-        data[10] = ((uint32_t)ref22 >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de velocidad y se almacenan en la onceaba
+        data[10] = ((uint32_t)ref2 >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de velocidad y se almacenan en la onceaba
                                                     //posicion del array data
 
-        data[11] = (uint32_t)ref22 & 0xff; //se extrae los bits 0-7 de la señal de referencia de velocidad y se almacenan en la doceaba
+        data[11] = (uint32_t)ref2 & 0xff; //se extrae los bits 0-7 de la señal de referencia de velocidad y se almacenan en la doceaba
                                            //posicion del array data
 
         data[12]=((uint32_t)velocidad >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba
