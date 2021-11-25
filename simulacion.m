@@ -1,6 +1,6 @@
 %% Parámetros del sistema
 %load('valores_para_control_LQR2.mat');
-load('opt_carga2.mat','Z');
+load('Z_carga','Z');
 %% Matrices continuas del sistema LTI
 A = [ -Z(1)/Z(2),         0, -Z(3)*Z(4)/Z(2);
                0,         0,               1;
@@ -60,10 +60,11 @@ else
     fprintf ('El sistema no es completamente controlable. \n');
 end
     
-Qbar = eye(4); Qbar(4,4) = 200; Qbar(3,3) = 0.5; %Qbar(4,4) = 100;
-Rbar = 1;
-%Klqi = lqr(Abar, Bbar, Qbar, Rbar);
-Klqi = [300 200 -1 500];
+Qbar = eye(4); %Qbar(4,4) = 200; Qbar(3,3) = 0.5; 
+Qbar(4,4) = 100;
+Rbar = 0.1;
+Klqi = lqr(Abar, Bbar, Qbar, Rbar);
+% Klqi = [300 200 -1 500];
 % Klqi = place(Abar, Bbar, [-0.1,-0.2,-0.3,-0.4]);
 xI = 0;
 tau_d = 0.73;

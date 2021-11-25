@@ -8,7 +8,7 @@ if proceso == 1
     s=read(S,1,'uint8');
     tiempo = 10000;
     p = tiempo-1;
-    dt = 0.01;
+    dt = 0.001;
     t0 = 0;
     tf = 9.99;
     k=9992;
@@ -31,6 +31,8 @@ if proceso == 1
                 velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
                 corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20));
             end
+            PULSO = pulso*12/4095;
+            CORRIENTE = corriente/1000;
             figure(1);clf;
             hold on;
             plot(t1,pulso');
@@ -43,13 +45,30 @@ if proceso == 1
             hold on;
             plot(t1,velocidad');
 
-            plot(t1,corriente')
-
             legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
+            figure(3);clf;
+            hold on;
+            
+            plot(t1,pulso_velocidad');
+            plot(t1,corriente');
+            
+
+            legend({'corriente medida','corriente filtrada'},'Location','northwest','FontSize',15);
+            
+            figure(4);clf;
+            hold on;
+            plot(t1,PULSO');
+
+            plot(t1,posicion');
+            plot(t1,CORRIENTE');
+            plot(t1,velocidad');
+
+            legend({'pulso','Posición','Corriente','Velocidad'},'Location','northeast','FontSize',15);
+
             break;
         end
     end
-    save('prueba_LQI.mat')
+    %save('prueba_LQI.mat')
 else
 
     load('Valores_impulso_con_carga.mat')

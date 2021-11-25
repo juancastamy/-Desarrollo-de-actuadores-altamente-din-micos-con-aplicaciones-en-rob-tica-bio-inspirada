@@ -1,14 +1,17 @@
 function sum = costfunc(Z)
     datos = 1;
     if datos == 1
-        load('optimizacion.mat','pos','vel','cor','ref');
+        load('datos_optimizacion2','PULSO','posicion','CORRIENTE','velocidad')
         %% Parámetros de la simulación
         t0 = 0;
         tf = 10; % tiempo de simulación
-        dt = 0.01;
-        N = (tf-t0)/dt;%(tf - t0) / dt;
-        t = t0:0.01:tf;
-        u=ref;
+        dt = 0.001;
+        N = 9990;%(tf-t0)/dt;%(tf - t0) / dt;
+        t = t0:0.001:tf;
+        u=PULSO;
+        cor = CORRIENTE';
+        pos = posicion';
+        vel = velocidad';
     else
         load('DATAREAL.mat')
         %% Parámetros de la simulación

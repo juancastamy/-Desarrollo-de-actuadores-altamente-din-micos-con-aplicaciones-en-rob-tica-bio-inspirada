@@ -85,7 +85,7 @@ const float k2 = 1;
 const float k3 = -1;
 const float k4 = 8;
 */
-float G=2;
+float G=10;
 
 
 const float k1 = 1;
@@ -113,7 +113,7 @@ float giro;
 float rev;
 
 float current_filt;
-float lambda = 0.6;
+float lambda = 0.7;
 float error_pos = 0;
 
 float volts = 0;
@@ -266,7 +266,10 @@ int main(void)
 
 
            error_pos = -posref + pos_tot;
+           if (error_pos > 0.01 || error_pos < -0.01)
+           {
            xI = xI + error_pos*dt;
+           }
 
            //u = -1*((k1*tau_e) + (k2*posicion) + (k3*velocidad) + (20*k4*xI)); no
 
@@ -287,7 +290,7 @@ int main(void)
         //pulso = ((float)abs(u)*4095)/12;
 
         direccion(u);
-        pulso = 30 + ((float)abs(u)*4095)/12;
+        pulso = 30 +((float)abs(u)*4095)/12;
         //IF PARA REALIZAR LA TOMA DE DATOS CON UART
         /*  if (GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)==0)
         {
@@ -343,16 +346,16 @@ int main(void)
         data[7] = (uint32_t)pos; //se extrae los bits 0-7 de la señal de posicion del encoder y se almacenan en la octava
                                       //posicion del array data
 //*******************************************************ENVIO DATOS VELOCIDAD*********************************************************
-        data[8] = ((uint32_t)ref22 >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena
+        data[8] = ((uint32_t)current >> 24) & 0xff;  //se extrae los bits 24-31 de la señal de referencia de velocidad y se almacenan en la novena
                                                    //posicion del array data
 
-        data[9] = ((uint32_t)ref22 >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de velocidad y se almacenan en la decima
+        data[9] = ((uint32_t)current >> 16) & 0xff;  //se extrae los bits 16-23 de la señal de referencia de velocidad y se almacenan en la decima
                                                    //posicion del array data
 
-        data[10] = ((uint32_t)ref22 >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de velocidad y se almacenan en la onceaba
+        data[10] = ((uint32_t)current >>  8) & 0xff;  //se extrae los bits 8-15 de la señal de referencia de velocidad y se almacenan en la onceaba
                                                     //posicion del array data
 
-        data[11] = (uint32_t)ref22 & 0xff; //se extrae los bits 0-7 de la señal de referencia de velocidad y se almacenan en la doceaba
+        data[11] = (uint32_t)current & 0xff; //se extrae los bits 0-7 de la señal de referencia de velocidad y se almacenan en la doceaba
                                            //posicion del array data
 
         data[12]=((uint32_t)velocidad >> 24) & 0xff; //se extrae los bits 24-31 de la señal de velocidad del encoder y se almacenan en la treceaba

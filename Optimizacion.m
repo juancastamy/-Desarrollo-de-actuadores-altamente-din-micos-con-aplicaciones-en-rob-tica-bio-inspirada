@@ -2,18 +2,12 @@ clear all;
 op=1;
 %load('Valores_impulso_unitario_para_realizar_graficas_correctas.mat');
 if op ==1
-    Z0 = [0.01;0.01;0.01;0.01;0.01;0.01;0.01]*0;
-    lb = zeros(1,7); %lb(4)=0.000065;
-    ub = [inf,inf,inf,inf,inf,inf,inf];%[10,0.01,inf,0.000065,inf,inf,inf];
-    %% Parámetros de la simulación
-    t0 = 0;
-    tf = 20; % tiempo de simulación
-    dt = 0.01;
-    %N = (tf - t0) / dt;
-    t = t0:0.01:tf-0.01;
-    t1 = t';
-    A = [];
-    b = [];
+    Z0 = zeros(7,1);
+    lb = zeros(1,7)'; lb(4)=0.065; lb(7)=0.005;%lb(4)=0.065;
+    ub = [1000,0.07,inf,0.065,inf,inf,0.007]';%[10,0.01,inf,0.000065,inf,inf,inf];
+    A = [0,0,0,0,0,1,-1;
+         0,0,0,0,1,-1 ,0];
+    b = [0;0];
     Aeq = [];
     beq = [];
     
