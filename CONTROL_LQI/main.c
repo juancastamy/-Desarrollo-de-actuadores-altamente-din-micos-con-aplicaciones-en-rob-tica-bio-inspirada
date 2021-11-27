@@ -307,7 +307,6 @@ int main(void)
             UARTCharPut(UART0_BASE,data[19]);
             n=0;
         }
-
     }
     return 0;
 }

@@ -22,7 +22,7 @@ if proceso == 1
             n=0;        
             count = count+1
         end
-
+%{
         if count==tiempo
             for i=1:(k-1)
                 pulso(i,:)=(data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4))*pi/180;
@@ -31,7 +31,7 @@ if proceso == 1
                 velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
                 corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20));
             end
-            PULSO = pulso*12/4095;
+            %PULSO = pulso*12/4095;
             CORRIENTE = corriente/1000;
             figure(1);clf;
             hold on;
@@ -45,31 +45,31 @@ if proceso == 1
             hold on;
             plot(t1,velocidad');
 
-            legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
+            legend({'Velocidad motor'},'Location','northwest','FontSize',15);
             figure(3);clf;
             hold on;
             
-            plot(t1,pulso_velocidad');
-            plot(t1,corriente');
+            plot(t1,CORRIENTE');
             
 
-            legend({'corriente medida','corriente filtrada'},'Location','northwest','FontSize',15);
+            legend({'corriente medida'},'Location','northwest','FontSize',15);
             
             figure(4);clf;
             hold on;
-            plot(t1,PULSO');
-
+            plot(t1,pulso');
             plot(t1,posicion');
             plot(t1,CORRIENTE');
-            plot(t1,velocidad');
+          %  plot(t1,velocidad');
 
-            legend({'pulso','Posición','Corriente','Velocidad'},'Location','northeast','FontSize',15);
+            legend({'pulso','Posición','Corriente'},'Location','northeast','FontSize',15);
 
             break;
+        
         end
+        %}
     end
     %save('prueba_LQI.mat')
-else
+elseif proceso == 2
 
     load('Valores_impulso_con_carga.mat')
 
@@ -107,5 +107,43 @@ else
     legend({'Ref posición','vel','Posición motor'},'Location','northeast','FontSize',15);
     save('Valores_para_optimizacion2.mat','pos','vel','cor','ref');
     
+else 
+   load('data_prueba_LQI','data','k','t1');
+   for i=1:(k-1)
+        pulso(i,:)=(data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4))*pi/180;
+        posicion(i,:)=(data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8))*pi/180;
+        pulso_velocidad(i,:)=data(i,9)*2^24+data(i,10)*2^16+data(i,11)*2^8+data(i,12);
+        velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
+        corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20));
+    end
+    PULSO = pulso*12/4095;
+    CORRIENTE = corriente/1000;
+    figure(1);clf;
+    hold on;
+    plot(t1,pulso');
+
+    plot(t1,posicion')
+
+    legend({'Ref posición','Posición motor'},'Location','northeast','FontSize',15);
+
+    figure(2);clf;
+    hold on;
+    plot(t1,velocidad');
+
+    legend({'Ref velocidad','Velocidad motor'},'Location','northwest','FontSize',15);
+    figure(3);clf;
+    hold on;
+    plot(t1,CORRIENTE');
+    legend({'corriente medida'},'Location','northwest','FontSize',15);
+
+    figure(4);clf;
+    hold on;
+    plot(t1,PULSO');
+
+    plot(t1,posicion');
+    plot(t1,CORRIENTE');
+    plot(t1,velocidad');
+
+    legend({'pulso','Posición','Corriente','Velocidad'},'Location','northeast','FontSize',15);
 end
 
