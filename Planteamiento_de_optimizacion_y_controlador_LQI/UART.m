@@ -1,7 +1,7 @@
-clear all;
+%clear all;
 %% CONFIGURACION PARA HABILITAR LA COMUNICACION SERIAL 
 
-proceso = 1;
+proceso = 3;
 if proceso == 1
     S = serialport('COM8', 115200);
     count = 1;
@@ -108,14 +108,20 @@ elseif proceso == 2
     save('Valores_para_optimizacion2.mat','pos','vel','cor','ref');
     
 else 
-   load('data_prueba_LQI','data','k','t1');
+  % load('data_prueba_LQI','data','k','t1');
+%   k=16693
+%   t0 = 0;
+%   tf = 16.691;
+%    t = t0:0.001:tf;
+%     t1=t';
    for i=1:(k-1)
         pulso(i,:)=(data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4))*pi/180;
         posicion(i,:)=(data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8))*pi/180;
         pulso_velocidad(i,:)=data(i,9)*2^24+data(i,10)*2^16+data(i,11)*2^8+data(i,12);
         velocidad(i,:)=data(i,13)*2^24+data(i,14)*2^16+data(i,15)*2^8+data(i,16);
         corriente(i,:)=(data(i,17)*2^24+data(i,18)*2^16+data(i,19)*2^8+data(i,20));
-    end
+   end
+  
     PULSO = pulso*12/4095;
     CORRIENTE = corriente/1000;
     figure(1);clf;
