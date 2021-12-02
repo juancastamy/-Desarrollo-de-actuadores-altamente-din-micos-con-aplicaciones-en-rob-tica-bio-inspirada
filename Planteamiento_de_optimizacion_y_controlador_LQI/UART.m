@@ -1,7 +1,7 @@
-%clear all;
+clear all;
 %% CONFIGURACION PARA HABILITAR LA COMUNICACION SERIAL 
 
-proceso = 3;
+proceso = 1;
 if proceso == 1
     S = serialport('COM8', 115200);
     count = 1;
@@ -109,11 +109,11 @@ elseif proceso == 2
     
 else 
   % load('data_prueba_LQI','data','k','t1');
-%   k=16693
-%   t0 = 0;
-%   tf = 16.691;
-%    t = t0:0.001:tf;
-%     t1=t';
+  k=5541
+  t0 = 0;
+  tf = 5.539;
+   t = t0:0.001:tf;
+    t1=t';
    for i=1:(k-1)
         pulso(i,:)=(data(i,1)*2^24+data(i,2)*2^16+data(i,3)*2^8+data(i,4))*pi/180;
         posicion(i,:)=(data(i,5)*2^24+data(i,6)*2^16+data(i,7)*2^8+data(i,8))*pi/180;

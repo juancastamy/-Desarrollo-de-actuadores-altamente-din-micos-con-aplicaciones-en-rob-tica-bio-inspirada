@@ -203,9 +203,9 @@ int main(void)
                xI = xI + error_pos*dt;
            }
 
-          u = -(((G*k1*tau_e)/1000 + (G*k2*pos_tot) + (G*k3*velocidad)) + (G*k4*xI));//salida del controlador
+          //u = -(((G*k1*tau_e)/1000 + (G*k2*pos_tot) + (G*k3*velocidad)) + (G*k4*xI));//salida del controlador
 
-          //u = -0.2*50*(pos_tot - posref);//control de posicion tipo P
+          u = -0.2*50*(pos_tot - posref);//control de posicion tipo P
 
            update = 0;//se limpia la bandera de la interrupcion
         }
