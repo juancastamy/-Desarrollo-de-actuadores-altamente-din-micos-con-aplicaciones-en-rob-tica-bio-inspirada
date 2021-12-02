@@ -109,9 +109,9 @@ elseif proceso == 2
     
 else 
   % load('data_prueba_LQI','data','k','t1');
-  k=5541
+  k=12139;
   t0 = 0;
-  tf = 5.539;
+  tf = 12.137;
    t = t0:0.001:tf;
     t1=t';
    for i=1:(k-1)
