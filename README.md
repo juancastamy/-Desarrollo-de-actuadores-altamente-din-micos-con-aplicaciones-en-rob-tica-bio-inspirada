@@ -1,6 +1,6 @@
 # -Desarrollo-de-actuadores-altamente-din-micos-con-aplicaciones-en-rob-tica-bio-inspirada
 # Controlador moderno LQI
-#   1. En el archivo "Planteamiento_de_optimizacion_y_controlador_LQI", se encuntra almacenado la fase del proyecto de control moderno mediante LQI.
+  1. En el archivo "Planteamiento_de_optimizacion_y_controlador_LQI", se encuntra almacenado la fase del proyecto de control moderno mediante LQI.
 #   2. En el folder "CONTRO_LQI", Esta almacenado el proyecto realizado en Code Composer Studio, que contiene la programacion del este controlador para la Tiva C.
 #   3. En el folder "Datos recopilado optimizacion", estan almacenadas diversas pruebas realizada de la optimizacion para plantear el contralor LQI en matlab.
 #      En el folder "optimizacion" dentro de este, se encuentra los datos "z_carga", los cuales son los que validaron el controlador LQI
