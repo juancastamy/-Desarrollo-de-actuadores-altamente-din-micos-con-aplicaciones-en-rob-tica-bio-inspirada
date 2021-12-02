@@ -19,3 +19,4 @@
   7. El archivo UART.m, es el que permite realizar la comunicacion UART directamente con la TIVA C y matlab.
   8. El archivo "simulacion.m", es el archivo con el cual se planteo el controlador LQI y se valido que este era implementable teoricamente.
  # Si es prueban los archivos con los resultados obtenido de matalb, ajustar el vector de tiempo y la contrante k para que se puedan graficar los resultados 
+ #Los videos de los resultados obtenidos se encuentran en el siguiente link: https://drive.google.com/drive/folders/1iSk8lgw2Ade7hkjXQ5iXjq29X_LL3meq?usp=sharing
