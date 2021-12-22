@@ -3,12 +3,12 @@ clear all;
 S = serialport('COM8', 115200);
 count = 1;
 s=read(S,1,'uint8');
-tiempo = 10000;
+tiempo = 5000;
 p = tiempo-1;
 dt = 0.01;
 t0 = 0;
-tf = 9.99;
-k=9992;
+tf = 4.997;
+k=4999;
 t = t0:0.001:tf;
 t1=t';
 while(1)
@@ -33,7 +33,7 @@ while(1)
 
         plot(t1,data_real2')
         
-        legend({'Ref posición','Posición motor'},'Location','northeast','FontSize',15);
+        legend({'Potenciómetro','Filtrado del potenciómetro'},'Location','northeast','FontSize',15);
         
         figure(2);clf;
         hold on;
@@ -46,3 +46,12 @@ while(1)
     end
 end
 
+for i = 1:4095
+    y(i,:) = i/4095*2*pi;
+    x(i,:) = i;
+end
+figure(1);clf;
+hold on;
+plot(x',y');
+xlabel('potenciómetro') 
+ylabel('\theta') 

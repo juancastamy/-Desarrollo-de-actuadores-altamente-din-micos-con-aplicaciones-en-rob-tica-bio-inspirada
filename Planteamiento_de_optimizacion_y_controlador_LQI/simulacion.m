@@ -1,6 +1,22 @@
 %% Parámetros del sistema
 %load('valores_para_control_LQR2.mat');
-load('Z_carga','Z');
+load('C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\Planteamiento_de_optimizacion_y_controlador_LQI\Datos recopilado optimizacion\optimizacion\Z_carga.mat');
+% Z =[2.2148;
+%     0.0062;
+%     0.0002;
+%     0.0650;
+%     0.0000;
+%    19.4947;
+%     0.0070];
+Z=[ 3.0102;
+    0.0100;
+    9.5590;
+    0.0650;
+    0.0000;
+    1.0000;
+    1.0000];
+%Z=[2.45262463789676;0.00324924658961627;199732612.300443;0.0650000000000000;115260994.187358;11646622.4913980;109367901.358715];
+%Z=[194.341327346494;0.0699999922683549;1.14103167571261e-05;0.0650000000000000;0.00999999717511219;0.00999999830790925;0.00999999914554207];
 %% Matrices continuas del sistema LTI
 A = [ -Z(1)/Z(2),         0, -Z(3)*Z(4)/Z(2);
                0,         0,               1;
@@ -15,7 +31,7 @@ D = 0;
 
 %% Parámetros de la simulación
 t0 = 0; % tiempo inicial
-tf = 10; % tiempo de simulación
+tf = 20; % tiempo de simulación
 dt = 0.001; % período de muestreo
 K = (tf - t0) / dt; % número de iteraciones
 
@@ -60,8 +76,8 @@ else
     fprintf ('El sistema no es completamente controlable. \n');
 end
     
-Qbar = eye(4); %Qbar(4,4) = 200; Qbar(3,3) = 0.5; 
-Qbar(4,4) = 100;
+Qbar = eye(4); Qbar(4,4) = 100; Qbar(2,2) = 0.5; 
+%Qbar(4,4) = 100;
 Rbar = 0.1;
 Klqi = lqr(Abar, Bbar, Qbar, Rbar);
 % Klqi = [300 200 -1 500];

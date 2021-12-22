@@ -124,6 +124,7 @@ else
   
     PULSO = pulso*12/4095;
     CORRIENTE = corriente/1000;
+    Referencia_cor=pulso_velocidad/1000;
     figure(1);clf;
     hold on;
     plot(t1,pulso');
@@ -140,7 +141,7 @@ else
     figure(3);clf;
     hold on;
     plot(t1,CORRIENTE');
-    legend({'corriente medida'},'Location','northwest','FontSize',15);
+    legend({'Corriente medida'},'Location','northwest','FontSize',15);
 
     figure(4);clf;
     hold on;

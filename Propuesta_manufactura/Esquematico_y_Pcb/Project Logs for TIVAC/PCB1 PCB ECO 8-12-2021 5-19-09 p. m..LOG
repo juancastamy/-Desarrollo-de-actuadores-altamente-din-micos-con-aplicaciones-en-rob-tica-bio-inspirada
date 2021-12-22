@@ -1,0 +1,18 @@
+Removed Pin From Net: NetName=Net*_2 Pin=*-2
+Removed Pin From Net: NetName=Net*_2 Pin=U?-34
+Removed Pin From Net: NetName=Net*_2 Pin=U?-63
+Change Net Name : Old Net Name=Net*_2 New Net Name=NetU?_32
+Added Pin To Net: NetName=Net*_1 Pin=*-1
+Added Pin To Net: NetName=Net*_1 Pin=*-1
+Added Pin To Net: NetName=Net*_1 Pin=*-2
+Added Pin To Net: NetName=Net*_1 Pin=*-2
+Added Pin To Net: NetName=Net*_1 Pin=U?-6
+Added Pin To Net: NetName=Net*_1 Pin=U?-7
+Added Pin To Net: NetName=Net*_1 Pin=U?-8
+Added Pin To Net: NetName=Net*_1 Pin=U?-28
+Added Pin To Net: NetName=Net*_1 Pin=U?-34
+Added Pin To Net: NetName=Net*_1 Pin=U?-59
+Added Pin To Net: NetName=Net*_1 Pin=U?-60
+Added Pin To Net: NetName=Net*_1 Pin=U?-63
+Added Net: Name=Net*_1
+Added Member To Class: ClassName=Esquematico_microcotrolador_actuador1 Member=Component * 2_PIN_HEADER

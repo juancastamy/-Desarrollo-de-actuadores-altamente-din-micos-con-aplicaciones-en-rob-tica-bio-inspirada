@@ -1,0 +1,4 @@
+Change Component Comment : Designator=R2 Old Comment=R New Comment=potenciometro
+Added Pin To Net: NetName=NetR2 Pin=R2-3
+Change Net Name : Old Net Name=NetR2 New Net Name=NetR2_3
+Added Room: Name=Esquematico_microcotrolador_actuador1

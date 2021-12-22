@@ -1,0 +1,6 @@
+Removed Pin From Net: NetName=GND Pin=Q1-11
+Removed Pin From Net: NetName=GND Pin=R7-2
+Added Pin To Net: NetName=NetQ1_11 Pin=Q1-11
+Added Pin To Net: NetName=NetQ1_11 Pin=R7-2
+Added Net: Name=NetQ1_11
+Added Room: Name=Esquematico_microcotrolador_actuador1

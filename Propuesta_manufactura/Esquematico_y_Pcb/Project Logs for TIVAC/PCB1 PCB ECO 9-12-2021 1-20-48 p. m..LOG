@@ -1,0 +1,31 @@
+Removed Pin From Net: NetName=NetJ1_1 Pin=J1-1
+Removed Pin From Net: NetName=NetJ1_2 Pin=J1-2
+Removed Pin From Net: NetName=NetJ1_3 Pin=J1-3
+Removed Pin From Net: NetName=NetJ2_1 Pin=J2-1
+Removed Pin From Net: NetName=NetJ2_2 Pin=J2-2
+Removed Pin From Net: NetName=NetJ2_3 Pin=J2-3
+Removed Pin From Net: NetName=NetJ3_1 Pin=J3-1
+Removed Pin From Net: NetName=NetJ3_2 Pin=J3-2
+Removed Pin From Net: NetName=NetJ3_3 Pin=J3-3
+Removed Pin From Net: NetName=NetJ3_4 Pin=J3-4
+Removed Pin From Net: NetName=+3.3V Pin=J4-1
+Added Component: Designator=J1(2_PIN_HEADER)
+Add component. Clean all parameters for all variants
+Added Component: Designator=J2(2_PIN_HEADER)
+Add component. Clean all parameters for all variants
+Added Component: Designator=J3(4_HEADERS)
+Add component. Clean all parameters for all variants
+Added Component: Designator=J4(1_HEADER)
+Add component. Clean all parameters for all variants
+Added Pin To Net: NetName=NetJ1_1 Pin=J1-1
+Added Pin To Net: NetName=NetJ1_2 Pin=J1-2
+Added Pin To Net: NetName=NetJ1_3 Pin=J1-3
+Added Pin To Net: NetName=NetJ2_1 Pin=J2-1
+Added Pin To Net: NetName=NetJ2_2 Pin=J2-2
+Added Pin To Net: NetName=NetJ2_3 Pin=J2-3
+Added Pin To Net: NetName=NetJ3_1 Pin=J3-1
+Added Pin To Net: NetName=NetJ3_2 Pin=J3-2
+Added Pin To Net: NetName=NetJ3_3 Pin=J3-3
+Added Pin To Net: NetName=NetJ3_4 Pin=J3-4
+Added Pin To Net: NetName=+3.3V Pin=J4-1
+Added Room: Name=Esquematico_microcotrolador_actuador1

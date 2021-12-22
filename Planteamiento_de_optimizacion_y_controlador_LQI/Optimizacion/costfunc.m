@@ -1,7 +1,7 @@
 function sum = costfunc(Z)
     datos = 1;
     if datos == 1
-        load('datos_optimizacion2','PULSO','posicion','CORRIENTE','velocidad')
+        load('C:\Users\juan\Documents\GitHub\Proyecto_de_Graduacion\Planteamiento_de_optimizacion_y_controlador_LQI\Datos recopilado optimizacion\datos de respuestas a impulsos para optimizacion\datos_optimizacion.mat');
         %% Parámetros de la simulación
         t0 = 0;
         tf = 10; % tiempo de simulación

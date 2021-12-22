@@ -55,6 +55,9 @@ float pos_pas;
 float pos_tot;
 //***********************************************************************************************************************************************
 
+float ref_filtrado;//fitrado de la senal de entrada
+float lambda = 0.95;//factor de fitro IIR
+
 float ref;//referencia del PID de posicion
 float salida_posicion;//Salida de la posicion del encoder en grados
 float ref2;//referencia del PID de velocidad
@@ -135,27 +138,6 @@ struct PID_values control_pid (float uk, float ek_1, float Ek_1, float x, float 
     return resultado;
 }
 
-
-//*************************************STRUCTO PARA EL FILTRADO DEL POTENCIOMETRO*********************************
-struct Filtro pt;
-struct Filtro
-{
-    float pot;
-};
-
-struct Filtro filtrado(float senal, float S, float alpha)
-{
-    //senal -> valor del ADC actual
-    //S -> salida pasada del filtro
-    //alpha -> valor que controla que tan intenso es el filtrado
-    struct Filtro potenciometro;
-    s = (alpha*senal)+((1-alpha)*S);
-    potenciometro.pot = s;
-    return potenciometro;
-}
-
-
-
 //**********************************INTERRIPCION DEL TIMER0 PARA LA TOMA DE MUESTRAS******************************
 void Timer0IntHandler(void){
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
@@ -213,14 +195,8 @@ int main(void)
            while(!ADCIntStatus(ADC0_BASE, 3, false));//SE ESPERA QUE EL STATUAS DEL ADC SEA FALSE
            ADCSequenceDataGet(ADC0_BASE, 3, &COUNT);// SE LEE ADC
 
-           if (fl==0)
-           {
-               fl=1;
-               pt.pot = COUNT;
-           }
-           pt = filtrado(COUNT, pt.pot, 0.05);
-           ref = (float)(pt.pot*2*3.1416/4095);
-
+           ref = (float)(COUNT*2*3.1416/4095);
+           ref_filtrado = lambda * ref_filtrado + (1-lambda) * ref;//fitro pasa bajas IIR
            sentido = QEIDirectionGet(QEI0_BASE);
            posicion = (float)(QEIPositionGet(QEI0_BASE)*2*3.1416/979.2);
 
@@ -269,7 +245,7 @@ int main(void)
            //out = control_pid (out.outp, out.Mep, out.MEp, pos_tot, ref,5,0.000001,0.0001,0);//PID para control en cascada
            giro=(float)(abs(out.outp)*4095)/(2*3.1416);
 
-           ref2 = (float)(pt.pot*52.35988/4095);//(float)(giro*52.35988/4095);
+           ref2 = (float)(ref_filtrado*52.35988/4095);//(float)(giro*52.35988/4095);
            velocidad = (float)(QEIVelocityGet(QEI0_BASE)*100*60/979.2)*0.10472;
            out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 1.5, 0.002, 0.00001, 1);//PID para control solo de posicion
            //out = control_pid (out.outv, out.Mev, out.MEv, velocidad, ref2, 1.25, 0.0, 0.00001, 1);//1.5//PID para control en cascada

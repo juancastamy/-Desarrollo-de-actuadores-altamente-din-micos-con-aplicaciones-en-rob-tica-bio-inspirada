@@ -1,0 +1,34 @@
+Removed Pin From Net: NetName=GND Pin=U1-36
+Added Component: Designator=*(Potenciometro)
+Add component. Clean all parameters for all variants
+Added Component: Designator=J1(2_PIN_HEADER)
+Add component. Clean all parameters for all variants
+Added Component: Designator=J2(2_PIN_HEADER)
+Add component. Clean all parameters for all variants
+Added Pin To Net: NetName=GND Pin=*-1
+Added Pin To Net: NetName=+3.3V Pin=*-2
+Added Pin To Net: NetName=GND Pin=U1-35
+Added Pin To Net: NetName=Net* Pin=U1-57
+Added Net: Name=Net*
+Added Pin To Net: NetName=NetJ1_1 Pin=J1-1
+Added Pin To Net: NetName=NetJ1_1 Pin=U1-53
+Added Net: Name=NetJ1_1
+Added Pin To Net: NetName=NetJ1_2 Pin=J1-2
+Added Pin To Net: NetName=NetJ1_2 Pin=U1-10
+Added Net: Name=NetJ1_2
+Added Pin To Net: NetName=NetJ1_3 Pin=J1-3
+Added Pin To Net: NetName=NetJ1_3 Pin=U1-60
+Added Net: Name=NetJ1_3
+Added Pin To Net: NetName=NetJ2_1 Pin=J2-1
+Added Pin To Net: NetName=NetJ2_1 Pin=U1-1
+Added Net: Name=NetJ2_1
+Added Pin To Net: NetName=NetJ2_2 Pin=J2-2
+Added Pin To Net: NetName=NetJ2_2 Pin=U1-24
+Added Net: Name=NetJ2_2
+Added Pin To Net: NetName=NetJ2_3 Pin=J2-3
+Added Pin To Net: NetName=NetJ2_3 Pin=U1-23
+Added Net: Name=NetJ2_3
+Added Member To Class: ClassName=Esquematico_microcotrolador_actuador1 Member=Component * R
+Added Member To Class: ClassName=Esquematico_microcotrolador_actuador1 Member=Component J1 HEADERS
+Added Member To Class: ClassName=Esquematico_microcotrolador_actuador1 Member=Component J2 HEADERS
+Added Room: Name=Esquematico_microcotrolador_actuador1

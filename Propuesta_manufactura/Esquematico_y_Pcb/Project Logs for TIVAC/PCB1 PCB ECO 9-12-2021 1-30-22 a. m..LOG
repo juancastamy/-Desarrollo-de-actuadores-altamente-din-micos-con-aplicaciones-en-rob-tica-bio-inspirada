@@ -1,0 +1,5 @@
+Added Component: Designator=*(1_HEADER)
+Add component. Clean all parameters for all variants
+Added Pin To Net: NetName=+3.3V Pin=*-1
+Added Member To Class: ClassName=Esquematico_microcotrolador_actuador1 Member=Component * 1_HEADER
+Added Room: Name=Esquematico_microcotrolador_actuador1
