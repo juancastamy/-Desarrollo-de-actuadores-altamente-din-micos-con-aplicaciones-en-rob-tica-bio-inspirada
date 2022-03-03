@@ -7,9 +7,9 @@ tiempo = 5000;
 p = tiempo-1;
 dt = 0.01;
 t0 = 0;
-tf = 9.99;
-k=9992;
-t = t0:0.001:tf;
+tf = 9.98;
+k=4999;
+t = t0:0.01:tf;
 t1=t';
 while(1)
     write(S,1,'char');
